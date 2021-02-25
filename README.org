@@ -1,0 +1,24 @@
+* Examples from talks
+
+The files in this directory are mostly more fleshed out examples from
+talks. They still consitute incomplete fragments but provide details
+that are otherwise missing in overviews.
+
+** Potawatomi possession PotawatomiPoss.v
+
+The phenomenon is described in:
+
+- [[https://noah.diewald.me/files/aimm4poster.pdf][The structure of Potawatomi hybrid-class overabundance]]
+
+** Quechua plurals QuechuaPlural.v
+
+The phenomenon is described in:
+
+- [[https://noah.diewald.me/files/diewald2018wp.pdf][WP for sign-based CGs: a focus on morphotactics]]
+
+** Wao Tededo future tense WaoFuture.v
+
+I have not uploaded the slides yet.
+
+
+
