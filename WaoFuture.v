@@ -291,3 +291,49 @@ Axiom pa_bo_ke_to_v_fut_1 : forall
     (mt : mtrip), (Fentry mt) ->
                   (lem (fst (fst mt)) [ pa ; bo ; ke ; base ]) ->
                   Sentry V_fut_1.
+
+(** ** An explanation of the syntactic categories
+
+In reality, a verbal syntactic category is generally of the form NP -o
+S for an intransitive and NP -o NP -o S for a transitive. Since the
+transitivity of the periphrase should be determined by what I am
+calling the participal, the actual scheme looks like the following:
+
+|- \lambda t s.s(t)·kebopa;(NP -o V.fut.part) -o NP.1 -o S;\lambda x
+   P.fut(P(x))
+
+This lexical entry for kebopa says that it takes an intransitive
+future participle and then feeds it a first person argument NP.1.
+
+|- boto;NP.1;first
+
+This is the lexical entry of a first person pronoun.
+
+|- epe;NP;water
+
+The above is the lexical entry for water.
+
+|- \lambda u v.u·v·beke;NP -o NP -o V.fut.part;\lambda w z.drink(z w)
+
+The above is the lexical entry for beke.
+
+First beke is combined with epe using modus ponens resulting in the
+following:
+
+|- \lambda u.u·epe·beke;NP -o V.fut.part;\lambda w.drink(water, w)
+
+This is now of the right type to combine with kebopa resulting in:
+
+|- \lambda t.t·epe·beke·kebopa;NP.1 -o S;\lambda x.fut(drink(water,
+   x))
+
+The expression can now be combined with the first person:
+
+|- boto·epe·beke·kebopa;S;fut(drink(water first))
+
+The basic notion is that any participal can be made intransitive by
+applying one arguement. Agreement can be handled completely by the
+auxiliary, which absorbs the subject argument of the participal when
+it combines with it.
+
+*)
