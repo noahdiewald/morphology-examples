@@ -21,9 +21,9 @@ The phenomenon is described in:
 The phenomenon is described in:
 
 - [[https://noah.diewald.me/files/diewald2018wp.pdf][WP for sign-based CGs: a focus on morphotactics]]
+- [[https://noah.diewald.me/files/free_2021.pdf][Overabundance and the interface]]
 
 ** Wao Tededo future tense: WaoFuture.v
 
-I have not uploaded the slides yet.
-
+- [[https://noah.diewald.me/files/free_2021.pdf][Overabundance and the interface]]
 
