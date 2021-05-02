@@ -134,7 +134,7 @@ Definition mtrip := mcat * mform * lexeme.
 with mtrips is not good enough. Non-grammatical triples check. We need
 to be able to specify which are legal triples. *)
 
-Check ( [ ke, base ] , "foot" , KEKI ).
+Check ( [ ke ; base ] , "foot" , KEKI ).
 
 (** Here I define Fentry, which is a predicate that is proveable when
 an mtrip is a valid lexical entity. *)
@@ -222,7 +222,7 @@ containing forms. *)
 
 Axiom add_kuna : forall
     (mt : mtrip), (Fentry mt) ->
-                  (lem (fst (fst mt)) [ bobase ]) ->
+                  (lem (fst (fst mt)) [ bostem ]) ->
                   Fentry (cons bo (fst (fst mt)),
                           suffix_bo (snd (fst mt)),
                           (snd mt)).
@@ -231,7 +231,7 @@ Axiom add_kuna : forall
 
 Axiom add_plta : forall
     (mt : mtrip), (Fentry mt) ->
-                  (lem (fst (fst mt)) [ pabase ]) ->
+                  (lem (fst (fst mt)) [ pastem ]) ->
                   Fentry (cons pa (fst (fst mt)),
                           suffix_pa (snd (fst mt)),
                           (snd mt)).
@@ -248,11 +248,11 @@ In order to hold somewhat to the spirit of the complete theory, I
 define Sentry which is the predicate for valid lexical entries. *)
 
 Inductive syncat : Set :=
-| V_fut_1 : matom
-| V_fut_3 : matom
-| V_fut_part : matom
-| V_fut_part_aux_1 : matom
-| V_fut_part_aux_3 : matom.
+| V_fut_1 : syncat
+| V_fut_3 : syncat
+| V_fut_part : syncat
+| V_fut_part_aux_1 : syncat
+| V_fut_part_aux_3 : syncat.
 
 Axiom Sentry : syncat -> Prop.
 
