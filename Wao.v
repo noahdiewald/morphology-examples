@@ -1,161 +1,161 @@
-Require Import Coq.Lists.List.
+(** * Wao Tededo Fragment
+    
+The purpose of this file is to eventually lay out a significant
+grammatical fragment of Wao Tededo, beginning with a simple treatment
+of adjectival classifiers. It is also a place where I plan to
+implement various innovations of the underlying formalism. *)
+
 Require Import Coq.Strings.String.
-Require Import Coq.Program.Basics.
-Import ListNotations.
+Require Import Coq.Unicode.Utf8.
 
 Open Scope type_scope.  Open Scope string_scope.
 
-Inductive matom : Set :=
-| base : matom
-| po : matom.
-    
-Definition mcat : Set := list matom.
+(** The quasi phonological representation of morphological forms use
+the string definition from the standard library. *)
 
-Definition mobjs : list mcat :=
-  [ [ base ] ; [ po ] ].
+Inductive mₘ : Set :=
+| baseₘ
+| poₘ
+| concatₘ : mₘ → mₘ → mₘ.
 
-Definition mobj : mcat -> Prop := fun x => In x mobjs.
+Infix "⊙" := concatₘ (at level 60, right associativity).
 
-Lemma mobj_base:
-  mobj [ base ].
-Proof.
-  cbv.
-  auto.
-Qed.
+(** mₘ is a kind of ad hoc name for some basic symbols used to form
+category names. *)
 
-Lemma mobj_po:
-  mobj [ po ].
-Proof.
-  cbv.
-  auto.
-Qed.
+Inductive Mₘ : mₘ → Prop :=
+| baseM : Mₘ baseₘ
+| poM : Mₘ poₘ.
 
-Definition mpair := (mcat * mcat).
+(** Using mₒ instances, a finite number of category names are
+licensed. *)
 
-Definition mmap (mp : mpair) : Prop :=
-  match mp with
-  | (x, y) => mobj x /\ mobj y
+Inductive leₘ : mₘ → mₘ → Prop :=
+| reflₘ : ∀ α, Mₘ α → leₘ α α
+| transₘ : ∀ α β γ, Mₘ α → Mₘ β → Mₘ γ → leₘ α β → leₘ β γ → leₘ α γ. 
+
+Axiom antisymₘ : ∀ α β : mₘ, leₘ α β → leₘ β α → α = β.
+
+Infix "≤ₘ" := leₘ (at level 60, right associativity).
+
+(** A partial order is defined over mₒ instances, where only Mₖ
+instances are ordered. *)
+
+Inductive lₗ : Set :=
+| ñeneₗ (* big *)
+| giitaₗ. (* small *)
+
+(** Lexemes are defined as a simple inductive type. *)
+
+Inductive kₖ : Set :=
+| adjₖ
+| anyₖ.
+                                              
+Inductive leₖ : kₖ → kₖ → Prop :=
+| topₖ : ∀ α β, α = anyₖ → leₖ α β
+| reflₖ : ∀ α, leₖ α α
+| transₖ : ∀ α β γ, leₖ α β → leₖ β γ → leₖ α γ.
+
+Axiom antisymₖ : ∀ α β, leₖ α β → leₖ β α → α = β.
+
+Infix "≤ₖ" := leₖ (at level 60, right associativity).
+
+(** Form classes are ordered with anyₖ as a top. *)
+
+Definition fₗₖ (α : lₗ) : kₖ :=
+  match α with
+  | ñeneₗ => adjₖ
+  | giitaₗ => adjₖ
   end.
 
-Definition mgraph := list (mcat * mcat).
+(** Each lexeme has a form class *)
 
-Definition lmgraph (mg : mgraph) := Forall mmap mg.
-
-Lemma nil_lmgraph:
-  lmgraph nil.
-Proof.
-  cbv.
-  auto.
-Qed.
-
-Section Mgraph.
-
-  Variable G : mgraph.
-  
-  Inductive lem : mcat -> mcat -> Prop :=
-  | defm : forall x y, lmgraph G -> mobj x -> mobj y -> In (x, y) G -> lem x y
-  | reflm : forall x y, lmgraph G -> mobj x -> mobj y -> x = y -> lem x y
-  | transm : forall x y z, lmgraph G -> mobj x -> mobj y -> mobj z -> lem x y -> lem y z -> lem x z.
-
-End Mgraph.
-
-Definition lemm := lem nil.
-
-Definition mcondition := fun y : mcat => (flip lemm) y.
-
-Axiom lem_antisym : forall x y : mcat, lem x y -> lem y x -> x = y.
-
-Inductive lexeme : Set :=
-| ÑENE : lexeme (* big *)
-| GIITA : lexeme. (* small *)
-
-Inductive fclass : Set :=
-| adjc
-| ñenec
-| giitac
-| anyc.
-
-Definition cgraph : list (fclass * fclass) :=
-[ (ñenec, adjc) ; (giitac, adjc) ; (adjc, anyc) ].
-                                              
-Inductive lec : fclass -> fclass -> Prop :=
-| lec_def : forall x y : fclass, In (x, y) cgraph -> lec x y
-| lec_refl : forall x y : fclass, x = y -> lec x y
-| lec_trans : forall x y z : fclass, lec x y -> lec y z -> lec x z.
-
-Definition mform := string.
-  
-Definition suffix_pa (stem:mform) : mform :=
+Definition poₜ (stem : string) : string :=
   stem ++ "po".
 
-Definition mtrip := mcat * mform * lexeme.
+Definition mpₘₚ := (mₘ * string).
+                        
+(** poₜ is a simple rule for suffixing the sting "po" to a base. *)
 
-Axiom Fentry : mtrip -> Prop.
+Definition ruleₘₚ (m : mₘ) (k : kₖ) (newₘ : mₘ) (t : string → string) :=
+  λ (α : mpₘₚ)
+    (l : lₗ)
+    (proofₘ : fst α ≤ₘ m)
+    (proofₖ : fₗₖ l ≤ₖ k), (newₘ, t (snd α)).
 
-Definition ñene_base := ([ base ], "ñene", ÑENE) : mtrip.
+Inductive MPₘₚ : mpₘₚ → lₗ → Prop :=
+| ñeneMP : MPₘₚ (baseₘ, "ñene") ñeneₗ
+| giitaMP : MPₘₚ (baseₘ, "giita") giitaₗ  
+| poMP : ∀ α l proofₘ proofₖ,
+    MPₘₚ α l → MPₘₚ ((ruleₘₚ baseₘ adjₖ poₘ poₜ) α l proofₘ proofₖ) l.
 
-Definition giita_base := ([ base ], "giita", GIITA) : mtrip.
+(** MPₘₚ is a predicate for determining form paradigm entries. *)
 
-Axiom f_ñene_base : Fentry ñene_base.
+Inductive Pₘₚ : mpₘₚ → mpₘₚ → Prop :=
+| inₘₚ : ∀ α β l, MPₘₚ α l → MPₘₚ β l → Pₘₚ α β
+| reflₘₚ : ∀ α l, MPₘₚ α l → Pₘₚ α α
+| transₘₚ : ∀ α β γ, Pₘₚ α β → Pₘₚ β γ → Pₘₚ α γ
+| symₘₚ : ∀ α β, Pₘₚ α β → Pₘₚ β α.
 
-Axiom f_giita_base : Fentry giita_base.
+(** The form paradigm for some lexeme is an equivalence class *)
 
-Axiom base_lem_bostem : lem [ base ] [ bostem ].
-Axiom ke_base_lem_bostem : lem [ ke ; base ] [ bostem ].
-Axiom bostem_lem_pastem : lem [ bostem ] [ pastem ].
-Axiom bo_lem_pastem : lem [ bo ; base ] [ pastem ].
-Axiom bo_ke_lem_pastem : lem [ bo ; ke ; base ] [ pastem ].
+Inductive ϕ : Set :=
+| ε
+| η : string → ϕ
+| concatϕ (α β : ϕ).
 
-Axiom add_ke : forall
-    (mt : mtrip), (Fentry mt) ->
-                  (lem (fst (fst mt)) [ base ]) ->
-                  Fentry (cons ke (fst (fst mt)),
-                          suffix_ke (snd (fst mt)),
-                          (snd mt)).
+Infix "•" := concatϕ (at level 60, right associativity).
 
-Axiom add_kuna : forall
-    (mt : mtrip), (Fentry mt) ->
-                  (lem (fst (fst mt)) [ bostem ]) ->
-                  Fentry (cons bo (fst (fst mt)),
-                          suffix_bo (snd (fst mt)),
-                          (snd mt)).
+(** The pheno is simplified. *)
 
-Axiom add_plta : forall
-    (mt : mtrip), (Fentry mt) ->
-                  (lem (fst (fst mt)) [ pastem ]) ->
-                  Fentry (cons pa (fst (fst mt)),
-                          suffix_pa (snd (fst mt)),
-                          (snd mt)).
+Inductive τ : Set :=
+| NP
+| N
+| Fin
+| infτ (α β : τ).
 
-Inductive syncat : Set :=
-| V_fut_1 : syncat
-| V_fut_3 : syncat
-| V_fut_part : syncat
-| V_fut_part_aux_1 : syncat
-| V_fut_part_aux_3 : syncat.
+Notation "x ⊸ y" := (infτ x y) (at level 60, right associativity).
 
-Axiom Sentry : syncat -> Prop.
+(** The tecto is simplified. *)
 
-Axiom ke_base_to_v_fut_part : forall
-    (mt : mtrip), (Fentry mt) ->
-                  (lem (fst (fst mt)) [ ke ; base ]) -> Sentry V_fut_part.
+Inductive sₛ : Set :=
+| eₛ
+| pₛ
+| fₛ (α β : sₛ).
 
-Axiom kepa_to_v_fut_part_aux_3 : forall
-    (mt : mtrip), (Fentry mt) ->
-                  (lem (fst (fst mt)) [ pa ; base ]) ->
-                  Sentry V_fut_part_aux_3.
+(** A temporary fill in for semantics *)
 
-Axiom kepa_to_v_fut_part_aux_1 : forall
-    (mt : mtrip), (Fentry mt) ->
-                  (lem (fst (fst mt)) [ pa ; bo ; base ]) ->
-                  Sentry V_fut_part_aux_1.
+Inductive meaning : lₗ → mₘ → sₛ → Prop :=
+| meaning₁ : ∀ l m, l = ñeneₗ → m = baseₘ → meaning l m eₛ.
 
-Axiom pa_ke_to_v_fut_3 : forall
-    (mt : mtrip), (Fentry mt) ->
-                  (lem (fst (fst mt)) [ pa ; ke ; base ]) ->
-                  Sentry V_fut_3.
+Definition spₛₚ := (ϕ * τ * sₛ).
 
-Axiom pa_bo_ke_to_v_fut_1 : forall
-    (mt : mtrip), (Fentry mt) ->
-                  (lem (fst (fst mt)) [ pa ; bo ; ke ; base ]) ->
-                  Sentry V_fut_1.
+(** A relation for providing proofs of lexical meanings *)
+
+Definition ruleₛₚ (m : mₘ) (k : kₖ) (t : τ) (s : sₛ) :=
+  λ (α : mpₘₚ)
+    (l : lₗ)
+    (mp : MPₘₚ α l)
+    (proofₘ : (fst α) ≤ₘ m)
+    (proofₖ : fₗₖ l ≤ₖ k)
+    (proofₛ : meaning l (fst α) s), (η (snd α), t, s).
+
+(** The above is a constructor for a mapping rule between form entries
+and sign entries *)
+
+Inductive SPₛₚ : spₛₚ → lₗ → Prop :=
+| simp_adjₛₚ : ∀ α l mp proofₘ proofₖ proofₛ,
+    SPₛₚ ((ruleₛₚ baseₘ adjₖ (N ⊸ N) (fₛ eₛ pₛ)) α l mp proofₘ proofₖ proofₛ) l.
+
+(** A SPₛₚ is essentially a well-formed lexical sign plus a lexeme
+reference used to simplify the identification of paradigms. For now,
+I'll leave the type with only one constructor. *)
+
+Inductive Pₛₚ : spₛₚ → spₛₚ → Prop :=
+| inₛₚ : ∀ α β l, SPₛₚ α l → SPₛₚ β l → Pₛₚ α β
+| reflₛₚ : ∀ α l, SPₛₚ α l → Pₛₚ α α
+| transₛₚ : ∀ α β γ, Pₛₚ α β → Pₛₚ β γ → Pₛₚ α γ
+| symₛₚ : ∀ α β, Pₛₚ α β -> Pₛₚ β α.
+
+(** A sign paradigm is an equivalence class. *)
+
