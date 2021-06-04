@@ -7,6 +7,7 @@ implement various innovations of the underlying formalism. *)
 
 Require Import Coq.Strings.String.
 Require Import Coq.Unicode.Utf8.
+Require Import Coq.Lists.List.
 
 Open Scope type_scope.  Open Scope string_scope.
 
@@ -140,12 +141,27 @@ Axiom tall : e → prop.
 
 Axiom small : e → prop.
 
+Axiom boat : e → prop.
+
+Axiom hand : e → prop.
+
 Definition sense := { s : statterm & Sns s}.
 
+Definition lexmeaning : list (lₗ * sense) := 
+  cons (ñeneₗ, existT Sns (func ent prp) big)
+       (cons (ñeneₗ, existT Sns (func ent prp) tall)
+             (cons (giitaₗ, existT Sns (func ent prp) small) nil)).
+
+Definition catmeaning : list (mₘ * sense) :=
+  cons (poₘ, existT Sns (func ent prp) boat)
+       (cons (poₘ, existT Sns (func ent prp) hand) nil).
+
+Definition conjmeaning (α β : e → prop) : (e → prop) :=
+  λ γ,(α γ) and (β γ).
+  
 Inductive meaning : sense → lₗ → mₘ → Prop :=
-| m₁ : ∀ l m, l = ñeneₗ → m = baseₘ → meaning (existT Sns (func ent prp) big) l m
-| m₂ : ∀ l m, l = ñeneₗ → m = baseₘ → meaning (existT Sns (func ent prp) tall) l m
-| m₃ : ∀ l m, l = giitaₗ → m = baseₘ → meaning (existT Sns (func ent prp) small) l m.
+  m₁ : ∀ s l m, m = baseₘ → In (l, s) lexmeaning → meaning s l m
+| m₂ : ∀ (s₁ : e → prop) (s₂ : e → prop) l m, m = poₘ → In (l, existT Sns (func ent prp) s₁) lexmeaning → In (m, existT Sns (func ent prp) s₂) catmeaning → meaning (existT Sns (func ent prp) (conjmeaning s₁ s₂)) l m.
 
 (** A relation for providing proofs of lexical meanings. This is at
 the proof of concept stage. *)
