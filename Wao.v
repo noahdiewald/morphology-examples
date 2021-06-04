@@ -20,14 +20,14 @@ Inductive mₘ : Set :=
 
 Infix "⊙" := concatₘ (at level 60, right associativity).
 
-(** mₘ is a kind of ad hoc name for some basic symbols used to form
-category names. *)
+(** mₘ are basic symbols used to form category names. Associated
+types, functions and relations will have ₘ in their name. *)
 
 Inductive Mₘ : mₘ → Prop :=
 | baseM : Mₘ baseₘ
 | poM : Mₘ poₘ.
 
-(** Using mₒ instances, a finite number of category names are
+(** Using mₘ instances, a finite number of category names Mₘ are
 licensed. *)
 
 Inductive leₘ : mₘ → mₘ → Prop :=
@@ -38,19 +38,25 @@ Axiom antisymₘ : ∀ α β : mₘ, leₘ α β → leₘ β α → α = β.
 
 Infix "≤ₘ" := leₘ (at level 60, right associativity).
 
-(** A partial order is defined over mₒ instances, where only Mₖ
+(** A partial order is defined over mₘ instances, where only Mₘ
 instances are ordered. *)
 
 Inductive lₗ : Set :=
 | ñeneₗ (* big *)
 | giitaₗ. (* small *)
 
-(** Lexemes are defined as a simple inductive type. *)
+(** Lexemes are defined as a simple inductive type lₗ. The ₗ is used
+in names of types, functions and relations associated with lexemes. *)
 
 Inductive kₖ : Set :=
 | adjₖ
 | anyₖ.
-                                              
+
+(** kₖ are names of form classes, similar in concept to inflection
+classes. The k is for the beginning sound of /klæs/ and like ₘ the ₖ
+is used for names of types, functions and relations associated with
+kₖ. *)
+
 Inductive leₖ : kₖ → kₖ → Prop :=
 | topₖ : ∀ α β, α = anyₖ → leₖ α β
 | reflₖ : ∀ α, leₖ α α
@@ -68,14 +74,19 @@ Definition fₗₖ (α : lₗ) : kₖ :=
   | giitaₗ => adjₖ
   end.
 
-(** Each lexeme has a form class *)
+(** Each lexeme has a form class. Hypothetically, this could
+eventually be defined as a relation. Not much hinges on the functional
+nature of the relation. *)
 
 Definition poₜ (stem : string) : string :=
   stem ++ "po".
-
-Definition mpₘₚ := (mₘ * string).
                         
 (** poₜ is a simple rule for suffixing the sting "po" to a base. *)
+
+Definition mpₘₚ := (mₘ * string).
+
+(** This type is named with ₘₚ instead of ₘₜ because it stands for
+morphological paradigm. *)
 
 Definition ruleₘₚ (m : mₘ) (k : kₖ) (newₘ : mₘ) (t : string → string) :=
   λ (α : mpₘₚ)
@@ -118,38 +129,50 @@ Notation "x ⊸ y" := (infτ x y) (at level 60, right associativity).
 
 (** The tecto is simplified. *)
 
-Inductive sₛ : Set :=
-| eₛ
-| pₛ
-| fₛ (α β : sₛ).
+Load extensions.
 
-(** A temporary fill in for semantics *)
+(** Using Jordan Needle's formalization of Agnostic Hyper-intentional
+Semantics. *)
 
-Inductive meaning : lₗ → mₘ → sₛ → Prop :=
-| meaning₁ : ∀ l m, l = ñeneₗ → m = baseₘ → meaning l m eₛ.
+Axiom big : e → prop.
 
-Definition spₛₚ := (ϕ * τ * sₛ).
+Inductive meaning : ∀ s, Sns s → lₗ → mₘ → Prop :=
+| meaning₁ : ∀ s (big : Sns s) l m, l = ñeneₗ → m = baseₘ → meaning s big l m.
 
 (** A relation for providing proofs of lexical meanings *)
 
-Definition ruleₛₚ (m : mₘ) (k : kₖ) (t : τ) (s : sₛ) :=
+Definition sense := { s : statterm & Sns s}.
+
+Check existT.
+
+Definition spₛₚ := (ϕ * τ * sense).
+
+(** A type alias for a lexical sign *)
+
+Definition ruleₛₚ (m : mₘ) (k : kₖ) (t : τ) (s : statterm) :=
   λ (α : mpₘₚ)
     (l : lₗ)
     (mp : MPₘₚ α l)
+    (sₗₑₓ : statterm)
+    (β : Sns sₗₑₓ)
+    (γ : Sns sₗₑₓ → Sns s)
     (proofₘ : (fst α) ≤ₘ m)
     (proofₖ : fₗₖ l ≤ₖ k)
-    (proofₛ : meaning l (fst α) s), (η (snd α), t, s).
+    (proofₛ : meaning sₗₑₓ β l (fst α)), (η (snd α), t, existT Sns s (γ β)).
 
 (** The above is a constructor for a mapping rule between form entries
 and sign entries *)
 
-Inductive SPₛₚ : spₛₚ → lₗ → Prop :=
-| simp_adjₛₚ : ∀ α l mp proofₘ proofₖ proofₛ,
-    SPₛₚ ((ruleₛₚ baseₘ adjₖ (N ⊸ N) (fₛ eₛ pₛ)) α l mp proofₘ proofₖ proofₛ) l.
+Definition e₁_identity (x : e → prop) := x.
 
-(** A SPₛₚ is essentially a well-formed lexical sign plus a lexeme
-reference used to simplify the identification of paradigms. For now,
-I'll leave the type with only one constructor. *)
+Inductive SPₛₚ : spₛₚ → lₗ → Prop :=
+| simp_adjₛₚ : ∀ α l mp (sₗₑₓ : statterm) β proofₘ proofₖ proofₛ,
+    SPₛₚ ((ruleₛₚ baseₘ adjₖ (N ⊸ N) (func ent prp))
+            α l mp (func ent prp) β e₁_identity proofₘ proofₖ proofₛ) l.
+
+(** A SPₛₚ is a well-formed lexical sign plus a lexeme reference used
+to simplify the identification of paradigms. For now, I'll leave the
+type with only one constructor. *)
 
 Inductive Pₛₚ : spₛₚ → spₛₚ → Prop :=
 | inₛₚ : ∀ α β l, SPₛₚ α l → SPₛₚ β l → Pₛₚ α β
