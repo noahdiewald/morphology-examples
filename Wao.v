@@ -161,7 +161,11 @@ Definition conjmeaning (α β : e → prop) : (e → prop) :=
   
 Inductive meaning : sense → lₗ → mₘ → Prop :=
   m₁ : ∀ s l m, m = baseₘ → In (l, s) lexmeaning → meaning s l m
-| m₂ : ∀ (s₁ : e → prop) (s₂ : e → prop) l m, m = poₘ → In (l, existT Sns (func ent prp) s₁) lexmeaning → In (m, existT Sns (func ent prp) s₂) catmeaning → meaning (existT Sns (func ent prp) (conjmeaning s₁ s₂)) l m.
+| m₂ : ∀ (s₁ : e → prop) (s₂ : e → prop) l m,
+    m = poₘ →
+    In (l, existT Sns (func ent prp) s₁) lexmeaning →
+    In (m, existT Sns (func ent prp) s₂) catmeaning →
+    meaning (existT Sns (func ent prp) (conjmeaning s₁ s₂)) l m.
 
 (** A relation for providing proofs of lexical meanings. This is at
 the proof of concept stage. *)
