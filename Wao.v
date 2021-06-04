@@ -143,8 +143,6 @@ Inductive meaning : ∀ s, Sns s → lₗ → mₘ → Prop :=
 
 Definition sense := { s : statterm & Sns s}.
 
-Check existT.
-
 Definition spₛₚ := (ϕ * τ * sense).
 
 (** A type alias for a lexical sign *)
