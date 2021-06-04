@@ -136,12 +136,19 @@ Semantics. *)
 
 Axiom big : e → prop.
 
-Inductive meaning : ∀ s, Sns s → lₗ → mₘ → Prop :=
-| meaning₁ : ∀ s (big : Sns s) l m, l = ñeneₗ → m = baseₘ → meaning s big l m.
+Axiom tall : e → prop.
 
-(** A relation for providing proofs of lexical meanings *)
+Axiom small : e → prop.
 
 Definition sense := { s : statterm & Sns s}.
+
+Inductive meaning : sense → lₗ → mₘ → Prop :=
+| m₁ : ∀ l m, l = ñeneₗ → m = baseₘ → meaning (existT Sns (func ent prp) big) l m
+| m₂ : ∀ l m, l = ñeneₗ → m = baseₘ → meaning (existT Sns (func ent prp) tall) l m
+| m₃ : ∀ l m, l = giitaₗ → m = baseₘ → meaning (existT Sns (func ent prp) small) l m.
+
+(** A relation for providing proofs of lexical meanings. This is at
+the proof of concept stage. *)
 
 Definition spₛₚ := (ϕ * τ * sense).
 
@@ -156,7 +163,7 @@ Definition ruleₛₚ (m : mₘ) (k : kₖ) (t : τ) (s : statterm) :=
     (γ : Sns sₗₑₓ → Sns s)
     (proofₘ : (fst α) ≤ₘ m)
     (proofₖ : fₗₖ l ≤ₖ k)
-    (proofₛ : meaning sₗₑₓ β l (fst α)), (η (snd α), t, existT Sns s (γ β)).
+    (proofₛ : meaning (existT Sns sₗₑₓ β) l (fst α)), (η (snd α), t, existT Sns s (γ β)).
 
 (** The above is a constructor for a mapping rule between form entries
 and sign entries *)
