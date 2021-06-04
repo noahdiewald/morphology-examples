@@ -183,7 +183,8 @@ Definition ruleₛₚ (m : mₘ) (k : kₖ) (t : τ) (s : statterm) :=
     (γ : Sns sₗₑₓ → Sns s)
     (proofₘ : (fst α) ≤ₘ m)
     (proofₖ : fₗₖ l ≤ₖ k)
-    (proofₛ : meaning (existT Sns sₗₑₓ β) l (fst α)), (η (snd α), t, existT Sns s (γ β)).
+    (proofₛ : meaning (existT Sns sₗₑₓ β) l (fst α)),
+  (η (snd α), t, existT Sns s (γ β)).
 
 (** The above is a constructor for a mapping rule between form entries
 and sign entries *)
@@ -191,13 +192,17 @@ and sign entries *)
 Definition e₁_identity (x : e → prop) := x.
 
 Inductive SPₛₚ : spₛₚ → lₗ → Prop :=
-| simp_adjₛₚ : ∀ α l mp (sₗₑₓ : statterm) β proofₘ proofₖ proofₛ,
+  simp_adjₛₚ : ∀ α l mp (sₗₑₓ : statterm) β proofₘ proofₖ proofₛ,
     SPₛₚ ((ruleₛₚ baseₘ adjₖ (N ⊸ N) (func ent prp))
+            α l mp (func ent prp) β e₁_identity proofₘ proofₖ proofₛ) l
+| po_adjₛₚ : ∀ α l mp (sₗₑₓ : statterm) β proofₘ proofₖ proofₛ,
+    SPₛₚ ((ruleₛₚ poₘ adjₖ (N ⊸ N) (func ent prp))
             α l mp (func ent prp) β e₁_identity proofₘ proofₖ proofₛ) l.
 
 (** A SPₛₚ is a well-formed lexical sign plus a lexeme reference used
-to simplify the identification of paradigms. For now, I'll leave the
-type with only one constructor. *)
+to simplify the identification of paradigms. The first constructor is
+for basic adjective with no classifier. The second is for an adjective
+with a classifier that takes a syntactic argument. *)
 
 Inductive Pₛₚ : spₛₚ → spₛₚ → Prop :=
 | inₛₚ : ∀ α β l, SPₛₚ α l → SPₛₚ β l → Pₛₚ α β
