@@ -76,8 +76,8 @@ Definition fₗₖ (α : lₗ) : kₖ :=
   end.
 
 (** Each lexeme has a form class. Hypothetically, this could
-eventually be defined as a relation. Not much hinges on the functional
-nature of the relation. *)
+eventually be defined as a non-functional relation. Not much hinges on
+the functional nature of the relation. *)
 
 Definition poₜ (stem : string) : string :=
   stem ++ "po".
@@ -130,8 +130,27 @@ Notation "x ⊸ y" := (infτ x y) (at level 60, right associativity).
 
 (** The tecto is simplified. *)
 
-Load extensions.
+Inductive stat_term : Set :=
+| ent
+| prp
+| func : stat_term -> stat_term -> stat_term.
 
+Axiom e prop : Set.
+Axiom truth falsity : prop.
+Axiom p_not : prop -> prop.
+Axiom p_and p_or p_implies p_iff : prop -> prop -> prop.
+Axiom p_entails : prop -> prop -> Prop.
+Definition p_equiv : prop -> prop -> Prop := fun p q : prop => (p_entails p q) /\ (p_entails q p).
+
+Fixpoint Sns (s : stat_term) : Set :=
+  match s with
+  | ent => e
+  | prp => prop
+  | func a b => (Sns a) -> (Sns b)
+  end.
+
+Infix "AND" := p_and (at level 80).
+                     
 (** Using Jordan Needle's formalization of Agnostic Hyper-intentional
 Semantics. *)
 
@@ -145,7 +164,9 @@ Axiom boat : e → prop.
 
 Axiom hand : e → prop.
 
-Definition sense := { s : statterm & Sns s}.
+(** sense is a sigma type. s is a stat term and Sns s must be inhabited. *)
+
+Definition sense := { s : stat_term & Sns s}.
 
 Definition lexmeaning : list (lₗ * sense) := 
   cons (ñeneₗ, existT Sns (func ent prp) big)
@@ -157,7 +178,7 @@ Definition catmeaning : list (mₘ * sense) :=
        (cons (poₘ, existT Sns (func ent prp) hand) nil).
 
 Definition conjmeaning (α β : e → prop) : (e → prop) :=
-  λ γ,(α γ) and (β γ).
+  λ γ,(α γ) AND (β γ).
   
 Inductive meaning : sense → lₗ → mₘ → Prop :=
   m₁ : ∀ s l m, m = baseₘ → In (l, s) lexmeaning → meaning s l m
@@ -174,11 +195,11 @@ Definition spₛₚ := (ϕ * τ * sense).
 
 (** A type alias for a lexical sign *)
 
-Definition ruleₛₚ (m : mₘ) (k : kₖ) (t : τ) (s : statterm) :=
+Definition ruleₛₚ (m : mₘ) (k : kₖ) (t : τ) (s : stat_term) :=
   λ (α : mpₘₚ)
     (l : lₗ)
     (mp : MPₘₚ α l)
-    (sₗₑₓ : statterm)
+    (sₗₑₓ : stat_term)
     (β : Sns sₗₑₓ)
     (γ : Sns sₗₑₓ → Sns s)
     (proofₘ : (fst α) ≤ₘ m)
@@ -192,10 +213,10 @@ and sign entries *)
 Definition e₁_identity (x : e → prop) := x.
 
 Inductive SPₛₚ : spₛₚ → lₗ → Prop :=
-  simp_adjₛₚ : ∀ α l mp (sₗₑₓ : statterm) β proofₘ proofₖ proofₛ,
+  simp_adjₛₚ : ∀ α l mp (sₗₑₓ : stat_term) β proofₘ proofₖ proofₛ,
     SPₛₚ ((ruleₛₚ baseₘ adjₖ (N ⊸ N) (func ent prp))
             α l mp (func ent prp) β e₁_identity proofₘ proofₖ proofₛ) l
-| po_adjₛₚ : ∀ α l mp (sₗₑₓ : statterm) β proofₘ proofₖ proofₛ,
+| po_adjₛₚ : ∀ α l mp (sₗₑₓ : stat_term) β proofₘ proofₖ proofₛ,
     SPₛₚ ((ruleₛₚ poₘ adjₖ (N ⊸ N) (func ent prp))
             α l mp (func ent prp) β e₁_identity proofₘ proofₖ proofₛ) l.
 
