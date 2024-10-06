@@ -1,14 +1,37 @@
-* Examples from talks
+* Examples from talks and papers
 
-The files in this directory are mostly more fleshed out examples from
-talks. They still consitute incomplete fragments but provide details
-that are otherwise missing in overviews.
+The files in this repository are mostly more fleshed out examples from talks.
+They still consitute incomplete fragments but provide details that are otherwise missing in overviews.
+
+In addition, there also code used in the development of the formal theory used in my thesis, "Wao Terero Lexical Suffixes".
+This represents my most current work on formal morphological theory and the most advanced formalism.
+
+The code is poorly commented.
+These files are intended to back up high level discussion from less technical talks and papers.
+They are not intended for use outside those contexts at this point.
+Please contact me if you have any questions about these files.
+I make them available not because they are polished but in the interest of open science.
+Please contact me before citing any work found here.
+
+** Background
 
 Some of the explanations in these files assume a knowledge of LCG. For
 a brief introduction, see the files:
 
 - introlcgho.pdf
 - raisingho.pdf
+
+I also lean considerably on the work of Jordan Needle for a formalism of key semantic theories.
+
+His work is found in:
+
+- CDS_prims.v
+- dynamic.v
+- extensions.v
+- THS.v
+- Vect.v
+
+I will provide a link to his thesis when it is available.
 
 ** Potawatomi possession: PotawatomiPoss.v
 
@@ -29,3 +52,14 @@ The phenomenon is described in:
 
 - [[https://noah.diewald.me/files/free_2021.pdf][Overabundance and the interface]]
 
+** Polysemy in Wao Terero Lexical Suffixes: Wao.v
+
+The phenomenon is described in:
+
+- [[https://noah.diewald.me/ismo2021.pdf][Wao Terero lexical suffixes: Bridging the lexicon
+and discourse]]
+
+** Lexical Suffix Analysis for Thesis: Wao2.v
+
+This is a work in progress.
+I will post a link to the thesis when it is complete.
