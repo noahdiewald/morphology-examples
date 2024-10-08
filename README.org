@@ -56,8 +56,7 @@ The phenomenon is described in:
 
 The phenomenon is described in:
 
-- [[https://noah.diewald.me/ismo2021.pdf][Wao Terero lexical suffixes: Bridging the lexicon
-and discourse]]
+- [[https://noah.diewald.me/ismo2021.pdf][Wao Terero lexical suffixes: Bridging the lexicon and discourse]]
 
 ** Lexical Suffix Analysis for Thesis: Wao2.v
 
