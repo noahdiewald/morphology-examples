@@ -1,6 +1,6 @@
 (** * Wao Tededo Fragment for Dissertation
 
-This file provides a morphological fragment of Wao Terero pattern
+This file provides a morphological fragment of Wao Terero patterns
 using a version of my theoretical framework as it was defined at the
 time of my dissertation. *)
 
@@ -13,6 +13,10 @@ Require Import Coq.Strings.String.
 
 Require Import Coq.Unicode.Utf8.
 
+(* A portion of Needle's hyperintentional semantics *)
+
+Load Semantics.
+
 (** I use lists as a convenient data structure. *)
 
 Require Import Coq.Lists.List.
@@ -21,116 +25,34 @@ Import Coq.Lists.List.ListNotations.
 Open Scope type_scope.
 Open Scope string_scope.
 
-
-(** `m` are basic symbols used as morph categories, where a morph is a
-morphological process. Types, functions and relations that manipulate
-`m` and collections of `m` will have ₘ in their name. The comments
-beside the `m` constructors below are not intended to 'define' the
-catagories, but to provide some intuition about which meanings and
-forms the element is commonly associated with.
-
-Form paradigm members are categorized using a pair of a list of `m`
-and a corresponding list of processes. Lists provide an order, which
-allows for some notion of simple scope. I view it as more like a
-record of rule application. Categories that appear earlier in the list
-do not necessarily correspond to morphs that occur earlier (to the
-left) in a word. The record is examined to determine form class, for
-instance whether an item can receive nominal or verbal inflection
-depending on some derivational category that may exist at the proper
-position in the record. This can be done without providing a list that
-provides such an order but the order reduces the number of `m` needed,
-since morphotactically [c₁, c₂] can be interpretted as distinct from
-[c₂, c₁]. It would be possible to use more category names an use a
-simple set but I feel there is an inherent notion of before and after
-in natural language, which is useful to abstract over but cannot be
-ignored. I am aware of no formal theory of morphology that ignores
-some notion of order and no system that captures derivational
-processes that is devoid of some concept of scope. In a theory like
-PFM, which relies on the notions of lexeme and stem, properties of
-those potentially morphologically complex entities affect the patterns
-of inflection that the theory describes, leaving derivational scope
-implicit. It is also the case that [c₁, c₂] versus [c₂, c₁] may also
-signal some conventional semantic scope, though this is not
-necessarily the case. Such patterns are easier to describe if there is
-some preservation of the order of rule application.
-
-A morphological process may have more than one morph category
-associated with it. So a process p may be associated with category c₁
-or c₂, depending on the definition of a rule. For instance, kã is used
-both as a lexical suffix and as the sentient third person, where its
-distribution and interpretation are distinct. Therefore a single
-category would be sufficiently ambiguous so as to complicate
-morphotactic description. It may be that in some cases when a single
-process p is associated with c₁ or c₂ that some analysis that
-collapses the two categories to a single category would be
-possible. For the sake of simplicity, and in order to more clearly
-delineate distributional domains -- for instance the domain of lexical
-suffix distributions and person suffix distributions -- I do not
-pursue such analyses unless they provide some interesting insight into
-the morphological system that justifies the move. Although I will not
-do so, rules may also associate a single process with multiple `m`. A
-process p may be associated with c₁ and c₂ ([c₁, c₂]), which might be
-advantageous when there is a cummulative morph of some kind. There are
-other ways of representing morphs that signal multiple cummulated
-meanings but the framework as it stands leaves this open to stylistic
-choice. This should make it clear that even prior to interpretting
-morphs in terms of their syntactic and semantic distributions and
-signals that processes do not stand in 1-to-1 correspondence with a
-category.
-
-Form paradigm members are categorized using lists of `m`. The list is
-a convenient data structure within the context of a computer
-programming language, or when induction is frequently used in proofs,
-type definitions and pattern matching functions. Lists are not the
-perfect match for the qualities a collection of `m` should have when
-categorizing form-paradigm members. The data structure advantageously
-preserves the order in which elements are appended as a series of
-`cons`. The list is inconvenient because it allows more than one of
-the same element to be added. There should be no more than one of the
-same `m` within a compound category for a form-paradigm member. This
-means that [ boₘ ] is legal but not `[ boₘ, boₘ ]`. In future
-revisions, I may define somethings similar to `Coq.Lists.ListSet`,
-which are finite sets implemented as lists. The issue with that data
-structure is that despite maintaining the uniqueness of every element
-of the set, and despite a list having a natural order, the order is
-not respected in the implementation of functions that perform
-operations on the data structure. So, something new needs to be
-defined to ensure that collections of `m` have the desired properties.
-
-I make due with an imperfect data structure because some
-implementation details are not very important at this stage in the
-formalization of the morphological theory. For that reason, I have an
-ad hoc solution. The list data structure is used, but I define a
-wrapper for append such that appending fails if any of the `m` in the
-list one is attempting to append already exists in the target
-list. So, `appendₘ [1, 2] [3, 4] = [1, 2, 3, 4]` but `appendₘ [1, 2]
-[2, 3, 4] = [2, 3, 4]`.
-
-For every free form in the lexicon, there is a category made up of a
-list of the elements below. For instance, the item "dika" has a list
-category of [ ka₁ₘ, Diₘ ]. The processes of unalayzable stems are
-given with an initial upper case letter. Not every list is a
-grammatical category, for that reason, the type constructor Mₘ is used
-as a predicate These elements are used for form categories, but are
-not categories themselves. A morphological category is a list of
-elements under the type constructor Mₘ. Each element c *)
+(** `m` are basic symbols used as components of morphological
+categories. Types, functions and relations that manipulate `m` and
+lists of `m` will have ₘ in their name. The comments beside the `m`
+constructors below are not intended to "define" the catagories, but to
+provide some intuition about which meanings and forms the element is
+commonly associated with. *)
 
 Inductive m : Set :=
-| Ãₘ (* The bound stem of the noun 'plant' and verb 'say'. *)
+| A₁ₘ (* The stem of the noun 'plant'. *)
+| A₂ₘ (* The stem of the noun 'to see'. *)
+| Ãₘ (* The stem of the verb 'to say'. *)
 | Adoₘ (* The stem of 'same' and the numeral 'one'. *)
+| Daaₘ (* The stem of 'thorn'. *)
 | Diₘ (* The bound stem of the noun 'stone'. *)
 | Dãtaₘ (* The stem of the verb 'to ache'. *)
-| Ĩₘ (* The stem of the copula, short third person pronouns and the distal demonstrative. *)
+| Eₘ (* The water stem. *)
 | Keₘ (* The stem of the verb 'to do'. *)
-| Kẽₘ (* The stem of the verb 'to eat' or 'to cut'. *)
+| Kẽ₁ₘ (* The stem of the verb 'to eat' or 'to cut'. *)
+| Kẽ₂ₘ (* The stem of the manioc noun. *)
+| Okiyeₘ (* The stem for 'woman'. *)
 | Peẽₘ (* The bound stem for the noun 'plantain'. *)
-| Tõbẽₘ (* The stem of long form pronouns. *)
+| Teₘ (* The bound stem for 'chonta' and 'chicha'. *)
 | Wiₘ (* The bound stem of the noun 'canoe'. *)
 | Yẽdẽₘ (* The stem of the adjective 'big'. *)
 (* Lexical suffixes *)
 | bõ₁ₘ (* The 'seed' lexical suffix. *)
 | dẽₘ (* The 'food' lexical suffix. *)
-| kaₘ (* The 'fruit' lexical suffix. *)
+| ka₁ₘ (* The 'fruit' lexical suffix. *)
 | kã₁ₘ (* The 'body' lexical suffix. *)
 | pa₁ₘ (* The 'board' lexical suffix. *)
 | poₘ (* The 'hand' lexical suffix. *)
@@ -156,19 +78,22 @@ Inductive m : Set :=
 | ke₂ₘ (* The limitive suffix. *)
 | ka₂ₘ (* The instrumental suffix. *)
 (* Abstract m categories. *)
-| Lxₘ (* Ending in a lexical suffix. *)
-| Prₘ (* Ending in a person suffix. *)
-| Leafₘ (* A singleton. *)
-| Infyₘ (* A stem for inflection. *)
-| LSyₘ (* A stem for lexical suffixes. *)
-| Nirstyₘ (* Not a first person stem. *)
-| Numberableₘ (* A stem for number suffixes. *)
-| Doubleableₘ (* A stem for the dual. *)
-| Plurableₘ. (* A stem for the feminine suffix. *)
+| LSₘ (* Ending in a lexical suffix. *)
+| PERSONₘ (* Ending in a person suffix. *)
+| PERSONABLEₘ (* Ending in a person suffix. *)
+| ROOTₘ (* A singleton. *)
+| INFₘ (* A stem for inflection. *)
+| LSABLEₘ (* A stem for lexical suffixes. *)
+| NONFIRSTₘ (* Not a first person stem. *)
+| NUMBERABLEₘ (* A stem for number suffixes. *)
+| DUALABLEₘ (* A stem for the dual. *)
+| PLURALABLEₘ (* A stem for the plural suffix. *)
+(* For instances when a meaningless m is needed. *)
+| noneₘ.
 
 (** Below I define boolean equality of `m`. The `+` is the disjoint
 sum constructor. Both equality (`=`) and inequality (`≠`) of `m` are
-of type Prop, for instance, Lxₘ = Lxₘ : Prop. Within constructive
+of type Prop, for instance, LSₘ = LSₘ : Prop. Within constructive
 logic, it is not automatically the case that proving that something is
 equal proves the negation of inequality, as it does in classical
 logic. It can be useful to have this property for some types. For
@@ -197,9 +122,9 @@ Definition m_dec : ∀ α β : m, {α = β} + {α ≠ β}.
 Proof. decide equality. Defined.
 Definition eqₘ α β := if m_dec α β then true else false.
 
-Example eq_kaₘ : eqₘ kaₘ kaₘ = true.
+Example eq_kaₘ : eqₘ ka₁ₘ ka₁ₘ = true.
 Proof. compute. reflexivity. Qed.
-       
+
 (** Using lists of `m` instances, category names `Mₘ` are
 licensed. The reason for doing this is that not all permutations of
 all sublists of `m` correspond to grammatical categories of form
@@ -211,33 +136,41 @@ Axiom Mₘ : (list m) → Prop.
 
 (** According to convention, which may depend on the needs of a
 particular analysis or the preferred style of the theorist, some `m`
-never in morphological rules. I call the `m` that correspond to
-particular morphological processes "concrete". Other categories are used
-to provide super categories for leaf categories. I call these
-categories "abstract" categories and it is usefult to be able to refer
-to a list of them. *)
+are only indirectly associated with morphological process lists, and
+only occur as singletons. I call the `m` that correspond to particular
+morphological processes "concrete". Other categories are used to
+provide super categories for these categories. I call these categories
+"abstract" categories and it is usefult to be able to refer to a list
+of them.
+
+They come in two flavors. One describes how a stem is, such as LSₘ,
+used when the stem ends in a LS. The other describes its potential for
+further affixation, such as LSABLEₘ, a stem that may be affixed with
+an LS. *)
 
 Definition abstractsₘ : list m :=
-  [ Lxₘ ;
-    Prₘ ;
-    Leafₘ ;
-    Infyₘ ;
-    LSyₘ ;
-    Nirstyₘ ;
-    Numberableₘ ;
-    Doubleableₘ ;
-    Plurableₘ
+  [ LSₘ ; (* Ends in a LS. *)
+    PERSONₘ ; (* Ends in person affix. *)
+    PERSONABLEₘ ; (* May be affixed for person. *)
+    ROOTₘ ; (* Singleton. *)
+    INFₘ ; (* Inflected. *)
+    LSABLEₘ ; (* May be affixed with LS. *)
+    NONFIRSTₘ ; (* Ends in a non-first person. *)
+    NUMBERABLEₘ ; (* May take the dual or plural. *)
+    DUALABLEₘ ; (* May take the dual. *)
+    PLURALABLEₘ (* May take the plural. *)
   ].
 
 (** There are other `m` that are usefully grouped to make the rules
 that define the partial order on `Mₘ` more succinct. *)
 
-(** `lxsₘ` is a list of lexical suffixes. *)
+(** `lssₘ` is a list of lexical suffixes. Items are described in the
+comments on the definition of `m'. *)
 
-Definition lxsₘ : list m :=
+Definition lssₘ : list m :=
   [ bõ₁ₘ ;
     dẽₘ ;
-    kaₘ ;
+    ka₁ₘ ;
     kã₁ₘ ;
     pa₁ₘ ;
     poₘ ;
@@ -246,9 +179,10 @@ Definition lxsₘ : list m :=
     wẽₘ
   ].
 
-(** `nirstsₘ` are affixes used for non-first person person and number marking. *)
+(** `nonfirstsₘ` are affixes used for non-first person and number
+marking. *)
 
-Definition nirstsₘ : list m :=
+Definition nonfirstsₘ : list m :=
   [ biₘ ;
     bĩₘ ;
     daₘ ;
@@ -259,157 +193,94 @@ Definition nirstsₘ : list m :=
 
 (** `personsₘ` are all person marking. *)
 
-Definition personsₘ : list m := boₘ :: bõ₂ₘ :: nirstsₘ.
+Definition personsₘ : list m := boₘ :: bõ₂ₘ :: nonfirstsₘ.
 
-(** Relationships between abstract Mₘ. *)
+(** Classes of roots that may be useful to refer to. *)
 
-Definition abstract_le_rulesₘ : (list (list m * list m)) :=
-  [ ([Lxₘ],[LSyₘ]) ;
-    ([Leafₘ], [LSyₘ]) ;
-    ([LSyₘ], [Infyₘ]) ;
-    ([LSyₘ], [Doubleableₘ]) ;
-    ([Numberableₘ], [ Doubleableₘ]) ;
-    ([Numberableₘ], [ Plurableₘ]) ;
-    ([Prₘ], [ Infyₘ]) ;
-    ([LSyₘ], [ Nirstyₘ])
-  ].
+Definition onerootsₘ : list m := [ Adoₘ ].
 
-(** These are some helper predicates for determining super categories of Mₘ *)
+Definition verbrootsₘ : list m := [ A₂ₘ ; Ãₘ ; Keₘ ].
 
-Fixpoint inₘ (α : m) (l : list m) : bool :=
-  match l with
-  | [] => false
-  | x :: t => if eqₘ x α then true else inₘ α t
-  end.
+Definition verblsrootssₘ : list m := [ Dãtaₘ ; Kẽ₁ₘ ].
 
-Fixpoint inabbₘ (α : m) (β : m) (l : list (list m * list m)) : bool :=
-      match l with
-      | [] => false
-      | ([x], [y]) :: t =>
-          match (eqₘ α x), (eqₘ β y) with
-          | true, true => true
-          | _, _ => inabbₘ α β t
-          end
-      | _ :: t => inabbₘ α β t
-      end.
+Definition adjrootsₘ : list m := [ Yẽdẽₘ ].
 
-Definition inabₘ (α : list m) (β : list m) : bool :=
-    match α, β with
-    | [], _ => false
-    | _, [] => false
-    | _ :: _ :: _, _ => false
-    | _, _ :: _ :: _ => false
-    | [x], [y] => inabbₘ x y abstract_le_rulesₘ
-    end.
+Definition inanimrootsₘ : list m := [ A₁ₘ ; Daaₘ ; Diₘ ; Eₘ ; Kẽ₂ₘ ; Peẽₘ ; Teₘ ; Wiₘ ].
 
-Definition hdIn (l₁ : list m) (l₂ : list m) : bool :=
-  match l₁ with
-  | [] => false
-  | x :: _ => inₘ x l₂
-  end.
-
-Definition isNirstyₘ (l₁ : list m) : bool :=
-  match l₁ with
-  | [] => false
-  | [x] => false
-  | x :: y :: _ => andb (inₘ x nirstsₘ) (negb (eqₘ y bõ₂ₘ))
-  end.
-
-(** All singeltons of abstract `m` are Mₘ *)
-
-Axiom Mₘ_abstractsₘ : ∀ (α : m), inₘ α abstractsₘ = true → Mₘ [α].
-    
-(** A partial order is defined over `m` lists, where only `Mₘ`
-instances are ordered. The basic properties are defined in the
-inductive type and a following axiom of antisymetry. The meat of the
-definition are more specific constructors that define the language
-specific category order. *)
-
-Inductive leₘ : (list m) → (list m) → Prop :=
-| reflₘ : ∀ α, Mₘ α → leₘ α α
-| transₘ : ∀ α β γ, Mₘ α → Mₘ β → Mₘ γ → leₘ α β → leₘ β γ → leₘ α γ
-(* All non-abstract singleton Mₘ are ≤ₘ [ Leafₘ ]. (hd Leafₘ α) is for
-retrieving the `m` as the list head. The occurance of Leafₘ is a
-default value required by the `hd` function for the case where α is
-nil. *)
-| leafₘ : ∀ α, Mₘ α → length α = 1 → ~ hdIn α abstractsₘ = true → leₘ α [Leafₘ]
-(* When the last process was a lexical suffix process, the category is
-a subcategory of Mₘ [Lxₘ]. *)
-| lxₘ : ∀ α, Mₘ α → hdIn α lxsₘ = true → leₘ α [Lxₘ]
-(* When the last `m` corresponds to person marking, the category is a
-subcategory of Mₘ [Prₘ]. *)
-| prₘ : ∀ α, Mₘ α → hdIn α personsₘ = true → leₘ α [Prₘ]
-(* bõ₂ₘ and bĩₘ correspond to stem endings where person number affixes
-may be added. Note, either plural or dual may be added to such
-stems. Only plural may be added to a stem with dãₘ. See below. *)
-| numerableₘ : ∀ α, Mₘ α → hdIn α [bõ₂ₘ;bĩₘ] = true → leₘ α [Numberableₘ]
-(* The placement of the past tense morph depends on whether or not the
-person marking on a verb is first person or otherwise. *)
-| nirstyₘ : ∀ α, Mₘ α → isNirstyₘ α = true → leₘ α [Nirstyₘ]
-(* The affix dãₘ may be followed by plural marking. *)
-| dãplₘ : ∀ α, Mₘ α → hdIn α [dãₘ] = true → leₘ α [Plurableₘ]
-(* The relation between abstract Mₘ is listed separately. *)
-| abstract_leₘ : ∀ α β, inabₘ α β = true → leₘ α β.
-
-Axiom antisymₘ : ∀ α β : (list m), leₘ α β → leₘ β α → α = β.
-
-Infix "≤ₘ" := leₘ (at level 60, right associativity).
-
-Example leq_is_refl : [Lxₘ] ≤ₘ [Lxₘ].
-Proof.
-  apply reflₘ.
-  apply Mₘ_abstractsₘ.
-  simpl.
-  reflexivity.
-Qed.
-
-Example leq_lx_lsy : [Lxₘ] ≤ₘ [LSyₘ].
-Proof.
-  apply abstract_leₘ.
-  simpl.
-  reflexivity.
-Qed.
-
+Definition animrootsₘ : list m := [ Okiyeₘ ].
+           
 (** K are names of form classes, similar in concept to inflection
-classes. The uppercase kappa `K' is a mnemonic for /klæs/.  Like ₘ the
-ₖ is used for names of types, functions and relations associated with
-K.  Variables of type K are written as κ or κₙ. The noneₖ class is for
-the nil case of a list of categories. It has no theoretical
-meaning. *)
+classes. The uppercase kappa `K' is a mnemonic for /klæs/. Like ₘ the
+ₖ subscript is used for names of types, functions and relations
+associated with K. Variables of type K are written as κ or κₙ. The
+noneₖ class is for the nil case of a list of categories. It has no
+theoretical meaning. It is used so that the klass function below can
+be defined as a total function, rather than using Maybe/option. *)
 
 Inductive K : Set :=
-| ãₖ
-| kẽₖ
-| plantyₖ
-| eatyₖ
-| bodyₖ
-| nounₖ
-| adjₖ
-| adj₁ₖ
-| adj₂ₖ
-| verbₖ
-| noneₖ. 
+| adjₖ (* Adjective-like items have person marking and lexical
+  suffixes in competition. *)
+| animₖ (* Animate noun-like items have person marking but no lexical
+  suffixes. *)
+| awẽₖ (* The noun awẽ ends in -wẽ, only. *)
+| bodyₖ (* Some items take only body-part affixes. *)
+| dikaₖ (* The noun dika ends in -ka, only. *)
+| epẽₖ (* The noun epẽ ends in -pẽ, only. *)
+| inanimₖ (* Inanimate noun-like items may have more than one LS, but
+  no person marking. *)
+| kẽdẽₖ (* The stem for manioc has a -we, and -dẽ ending but nothing
+  else. *)
+| oneₖ (* The class of adoke, `one', and ado, `same'. *)
+| personₖ (* Items that take person marking. *)
+| peẽdẽₖ (* The noun peẽdẽ ends only in -dẽ. *)
+| singlelsₖ (* This covers adjectives and LS taking verbs. *)
+| tepẽₖ (* The noun tepẽ and tewẽ, which have only two endings. *)
+| thingₖ (* Items that take any LS. *)
+| verbbodyₖ (* Verbs that take only body LSs *)
+| verblsₖ (* Verbs that take LSs. *)
+| verbₖ (* General verbs, which may not take LSs. *)
+| wipoₖ (* The noun wipo ends only in -po. *)
+| noneₖ. (* The default class. *)
 
 Definition K_dec : ∀ α β : K, {α = β} + {α ≠ β}.
 Proof. decide equality. Defined.
 Definition eqₖ α β := if K_dec α β then true else false.
 
-Example eq_eatyₖ : eqₖ eatyₖ eatyₖ = true.
+Example eq_eatyₖ : eqₖ bodyₖ bodyₖ = true.
 Proof. compute. reflexivity. Qed.
 
+(* Below is the list of rules for the form class order. Items on the
+left of the pairs are ordered below those on the right. These rules
+are refered to in the definition of the ≤ₖ order. *)
+
 Definition le_rulesₖ : list (K * K) :=
-  [ (ãₖ, plantyₖ) ;
-    (ãₖ, verbₖ) ;
-    (kẽₖ, verbₖ) ;
-    (kẽₖ, plantyₖ) ;
-    (kẽₖ, eatyₖ) ;
-    (kẽₖ, bodyₖ) ;
-    (adj₁ₖ, plantyₖ) ;
-    (adj₁ₖ, eatyₖ) ;
-    (adj₁ₖ, bodyₖ) ;
-    (nounₖ, plantyₖ) ;
-    (nounₖ, eatyₖ) ;
-    (nounₖ, bodyₖ)
+  [ (bodyₖ, dikaₖ) ; (* Items with the LS -ka may be body part LSs. *)
+    (bodyₖ, wipoₖ) ; (* Items with the LS -po may be body part LSs. *)
+    (tepẽₖ, epẽₖ) ; (* The te- stem may end in -pẽ. *)
+    (tepẽₖ, awẽₖ) ; (* The te- stem may end in -wẽ. *) 
+    (kẽdẽₖ, peẽdẽₖ) ; (* The kẽ- stem may end in -dẽ. *) 
+    (kẽdẽₖ, awẽₖ) ; (* The kẽ- stem may end in -wẽ. *) 
+    (thingₖ, kẽdẽₖ) ; (* The general ls-taking class includes -wẽ and
+    -dẽ *)
+    (thingₖ, tepẽₖ) ; (* The general ls-taking class includes -wẽ and
+    -pẽ *)
+    (thingₖ, bodyₖ) ; (* The general ls-taking class includes body
+    affixes *)
+    (animₖ, personₖ) ; (* Animate nouns may take person marking *)
+    (adjₖ, personₖ) ; (* Adjectives may take person marking *)
+    (verbₖ, personₖ) ; (* Verbs may take person marking *)
+    (oneₖ, personₖ) ; (* The numeral one may take person marking *)
+    (verblsₖ, verbₖ) ; (* Verbs that take lexical suffixes are verbs
+    *)
+    (verbbodyₖ, verblsₖ) ; (* Verbs that take body LS only are LS
+    taking verbs *)
+    (verbbodyₖ, bodyₖ) ; (* Verbs that take body LS *)
+    (adjₖ, thingₖ) ; (* Adjectives can take any lexical suffix *)
+    (oneₖ, thingₖ) ; (* The numeral one may take any lexical suffix *)
+    (inanimₖ, thingₖ) ; (* Inanimate nominals may take any lexical
+    suffix *)
+    (verblsₖ, singlelsₖ) ; (* Verbs only take one LS *)
+    (adjₖ, singlelsₖ) (* Adjectives only take one LS *)
   ].
 
 Fixpoint inrulesₖ (α : K) (β : K) (l : list (K * K)) : bool :=
@@ -433,46 +304,151 @@ Axiom antisymₖ : ∀ α β, leₖ α β → leₖ β α → α = β.
 
 Infix "≤ₖ" := leₖ (at level 60, right associativity).
 
-Example nounₖ_leq_eatyₖ : nounₖ ≤ₖ eatyₖ.
+Example adjₖ_leq_thingₖ : adjₖ ≤ₖ thingₖ.
 Proof.
   apply rulesₖ.
   simpl.
   reflexivity.
 Qed.
-  
+
 (** A subset of `list m` terms are stems.
 They may not be free so they may not correspond to a Mₘ. *)
 
 Fixpoint klass (α : list m) : K :=
   match α with
   | [] => noneₖ
-  | [kaₘ ; Diₘ] => nounₖ
-  | [wẽₘ ; Ãₘ] => nounₖ 
-  | [wẽₘ ; Kẽₘ] => nounₖ
-  | [dẽₘ ; Kẽₘ] => nounₖ
-  | [x ; Kẽₘ] => match inₘ x lxsₘ with
-                 | true => verbₖ
-                 | false => kẽₖ
-                 end
-  | [Ãₘ] => ãₖ
-  | [Kẽₘ] => kẽₖ
-  | [x ; Yẽdẽₘ] => match inₘ x lxsₘ with
-                   | true => adj₂ₖ
-                   | false => adj₁ₖ
-                   end
-  | [Yẽdẽₘ] => adj₁ₖ
+  | [Adoₘ] => oneₖ
+  | [A₁ₘ] => awẽₖ
+  | [A₂ₘ] => verbₖ
+  | [Ãₘ] => verbₖ
+  | [Daaₘ] => inanimₖ
+  | [Diₘ] => dikaₖ
+  | [Dãtaₘ] => verbbodyₖ
+  | [Eₘ] => epẽₖ
   | [Keₘ] => verbₖ
+  | [Kẽ₁ₘ] => verbbodyₖ
+  | [Kẽ₂ₘ] => kẽdẽₖ
+  | [Okiyeₘ] => animₖ
+  | [Peẽₘ] => peẽdẽₖ
+  | [Teₘ] => tepẽₖ
+  | [Wiₘ] => wipoₖ
+  | [Yẽdẽₘ] => adjₖ
+  | [_ ; A₁ₘ] => inanimₖ
+  | [_ ; Diₘ] => inanimₖ
+  | [_ ; Eₘ] => inanimₖ
+  | [_ ; Kẽ₂ₘ] => inanimₖ
+  | [_ ; Peẽₘ] => inanimₖ
+  | [_ ; Teₘ] => inanimₖ
+  | [_ ; Wiₘ] => inanimₖ
   | _ :: t => klass t
   end.
 
-Example yẽdẽka_klass : klass [kaₘ ; Yẽdẽₘ] = adj₂ₖ.
+Example yẽdẽka_klass : klass [ka₁ₘ ; Yẽdẽₘ] = adjₖ.
 Proof. compute. reflexivity. Qed.
 
-Example yẽdẽ_klass : klass [Yẽdẽₘ] = adj₁ₖ.
-Proof. compute. reflexivity. Qed.
+(** These are some helper predicates for determining super categories of Mₘ *)
 
-Example yẽdẽbo_klass : klass [boₘ ; Yẽdẽₘ] = adj₁ₖ.
-Proof. compute. reflexivity. Qed.
+Fixpoint inₘ (α : m) (l : list m) : bool :=
+  match l with
+  | [] => false
+  | x :: t => if eqₘ x α then true else inₘ α t
+  end.
+
+Fixpoint inabbₘ (α : m) (β : m) (l : list (list m * list m)) : bool :=
+      match l with
+      | [] => false
+      | ([x], [y]) :: t =>
+          match (eqₘ α x), (eqₘ β y) with
+          | true, true => true
+          | _, _ => inabbₘ α β t
+          end
+      | _ :: t => inabbₘ α β t
+      end.
+
+(** Relationships between abstract Mₘ, which may be shared by all form classes. *)
+
+Definition abstract_leₘ_rulesₘ : (list (list m * list m)) :=
+  [ ([ ROOTₘ ],[ PERSONABLEₘ ]) ;
+    ([ ROOTₘ ], [ DUALABLEₘ ]) ; (* Although not all roots take person
+    affixes, most do and those that don't will be of the wrong form
+    class for this ordering to matter. *)
+    ([ NUMBERABLEₘ ], [ DUALABLEₘ]) ;
+    ([ NUMBERABLEₘ ], [ PLURALABLEₘ ])
+  ].
+
+Definition inabₘ (α : list m) (β : list m) : bool :=
+    match α, β with
+    | [], _ => false
+    | _, [] => false
+    | _ :: _ :: _, _ => false
+    | _, _ :: _ :: _ => false
+    | [x], [y] => inabbₘ x y abstract_leₘ_rulesₘ
+    end.
+
+Definition hdIn (l₁ : list m) (l₂ : list m) : bool :=
+  match l₁ with
+  | [] => false
+  | x :: _ => inₘ x l₂
+  end.
+
+Definition isNonFirstₘ (l₁ : list m) : bool :=
+  match l₁ with
+  | [] => false
+  | [x] => false
+  | x :: y :: _ => andb (inₘ x nonfirstsₘ) (negb (eqₘ y bõ₂ₘ))
+  end.
+
+(** All singeltons of abstract `m` are Mₘ *)
+
+Axiom Mₘ_abstractsₘ : ∀ (α : m), inₘ α abstractsₘ = true → Mₘ [α].
+
+(** A partial order is defined over `m` lists, where only `Mₘ`
+instances are ordered. The basic properties are defined in the
+inductive type and a following axiom of antisymetry. The meat of the
+definition are more specific constructors that define the language
+specific category order. *)
+
+Inductive leₘ : (list m) → (list m) → Prop :=
+| reflₘ : ∀ α, Mₘ α → leₘ α α
+| transₘ : ∀ α β γ, Mₘ α → Mₘ β → Mₘ γ → leₘ α β → leₘ β γ → leₘ α γ
+(* All non-abstract singleton Mₘ are ≤ₘ [ ROOTₘ ]. *)
+| rootₘ : ∀ α, Mₘ α → length α = 1 → ~ hdIn α abstractsₘ = true → leₘ α [ROOTₘ]
+(* When the last process was a lexical suffix process, the category is
+a subcategory of Mₘ [LSₘ]. *)
+| lsₘ : ∀ α, Mₘ α → hdIn α lssₘ = true → leₘ α [LSₘ]
+(* When the last `m` corresponds to person marking, the category is a
+subcategory of Mₘ [PERSONₘ]. *)
+| prₘ : ∀ α, Mₘ α → hdIn α personsₘ = true → leₘ α [PERSONₘ]
+(* bõ₂ₘ and bĩₘ correspond to stem endings where person number affixes
+may be added. Note, either plural or dual may be added to such
+stems. Only plural may be added to a stem with dãₘ. See below. *)
+| numerableₘ : ∀ α, Mₘ α → hdIn α [bõ₂ₘ;bĩₘ] = true → leₘ α [NUMBERABLEₘ]
+(* The placement of the past tense morph depends on whether or not the
+person marking on a verb is first person or otherwise. *)
+| nirstyₘ : ∀ α, Mₘ α → isNonFirstₘ α = true → leₘ α [NONFIRSTₘ]
+(* The affix dãₘ may be followed by plural marking. *)
+| dãplₘ : ∀ α, Mₘ α → hdIn α [dãₘ] = true → leₘ α [PLURALABLEₘ]
+(* The relation between abstract Mₘ is listed separately. *)
+| abstract_leₘ : ∀ α β, inabₘ α β = true → leₘ α β
+(* The Mₘ, which describe morphotactics are parameterized based on class. *)
+(* Some verbs, demonstratives, and adjectives allow a single LS *)    
+| singleₘ : ∀ α, Mₘ α → klass α ≤ₖ singlelsₖ → leₘ [ROOTₘ] [LSABLEₘ]
+(* LSs and person marking don't compete on verbs. *)
+| verblsₘ : ∀ α, Mₘ α → klass α ≤ₖ verblsₖ → leₘ [LSₘ] [PERSONABLEₘ]
+(* Inanimate nouns may take any number of LS *)
+| inanimₘ : ∀ α, Mₘ α → klass α ≤ₖ inanimₖ → leₘ [LSₘ] [LSABLEₘ].
+                                                 
+Axiom antisymₘ : ∀ α β : (list m), leₘ α β → leₘ β α → α = β.
+
+Infix "≤ₘ" := leₘ (at level 60, right associativity).
+
+Example leq_is_refl : [LSₘ] ≤ₘ [LSₘ].
+Proof.
+  apply reflₘ.
+  apply Mₘ_abstractsₘ.
+  simpl.
+  reflexivity.
+Qed.
 
 (** Rather than eagerly building up strings, morphological rules build
 a list of processes that are applied at some point of evaluation, such
@@ -492,6 +468,9 @@ Fixpoint applyₚᵣ (processes : list processₚᵣ) (acc : string → string) 
 string to string functions to string to string functions. Stems,
 notably, take an input string to string function and return a
 constant-like function, which disgards its input. *)
+
+Definition toₚᵣ (p : string → string) : (string → string) :=
+  λ (s : string), (p s) ++ "to".
 
 Definition ãₚᵣ (p : string → string) : (string → string) :=
   λ (_ : string), p "ã".
@@ -564,6 +543,15 @@ Proof.
   reflexivity.
 Qed.
 
+(** This example demonstrates a process that is always applied last *)
+
+Example bõdito_application:
+  applyₚᵣ (toₚᵣ :: di₂ₚᵣ :: bõₚᵣ :: nil) idₚᵣ = "bõdito".
+Proof.
+  simpl.
+  reflexivity.
+Qed.
+
 (** The data structure used by the form paradigm is a pair of a
 category (list m) and a list of processes. *)
 
@@ -592,113 +580,107 @@ an input compound category, a form class constraint, a new category
 that will be added to the compound category and a new process to be
 added to the process list. *)
 
+(* The first rule schema for defining a form-form mapping is
+rule1ₘₚ. This rule takes the category that the rules will be
+constrained by, the class it will be constrained by, some new category
+information and new process information. It provides a function that
+takes an input form entry struct, and proofs that the entry matches
+the category and class conditions. It then returns a new entry where
+the new category and process information is appended to the existing
+information. *)
+
 Definition rule1ₘₚ (catₘ : list m) (κ : K) (newₘ : list m) (newₚᵣ : list processₚᵣ) :=
   λ (α : structₘₚ)
     (proofₘ : fst α ≤ₘ catₘ)
     (proofₖ : klass (fst α) ≤ₖ κ),
     combineₘₚ newₘ (fst α) newₚᵣ (snd α).
 
-(* I am still not sure how I want to do this.
+(* The rule2ₘₚ schema is essentially the same as rule1ₘₚ, except that
+combineₘₚ takes the tails of the input category and process
+information, roughly swapping out the heads. This is why these rules
+are called lateral rules. *)
+
 Definition rule2ₘₚ (catₘ : list m) (κ : K) (newₘ : list m) (newₚᵣ : list processₚᵣ) :=
   λ (α : structₘₚ)
     (proofₘ : fst α ≤ₘ catₘ)
     (proofₖ : klass (fst α) ≤ₖ κ),
-    (newₘ :: (tail (fst α)), newₚᵣ :: (tail (snd α))). *)
+    combineₘₚ newₘ (tail (fst α)) newₚᵣ (tail (snd α)).
+
+(* The inductive definition of valid form entries. *)
 
 Inductive FEₘₚ : structₘₚ → Prop :=
-| kẽMP : FEₘₚ ( [Kẽₘ], [kẽₚᵣ] )
+| kẽMP : FEₘₚ ( [Kẽ₁ₘ], [kẽₚᵣ] )
 | keMP : FEₘₚ ( [Keₘ], [keₚᵣ] )
 | yẽdẽMP : FEₘₚ ( [Yẽdẽₘ], [yẽdẽₚᵣ] )
-| dikaMP : FEₘₚ ( [kaₘ ; Diₘ], [kaₚᵣ ; di₁ₚᵣ] )
-(*| peẽdẽMP : FEₘₚ ( [dẽₘ ; Peẽₘ], [dẽₚᵣ ; peẽₘ] )*)
+| dikaMP : FEₘₚ ( [ka₁ₘ ; Diₘ], [kaₚᵣ ; di₁ₚᵣ] )
+| peẽdẽMP : FEₘₚ ( [dẽₘ ; Peẽₘ], [dẽₚᵣ ; peẽₚᵣ] )
 | ãMP : FEₘₚ ( [Ãₘ], [ãₚᵣ] )
 | kaMP : ∀ α proofₘ proofₖ,
-    FEₘₚ α → FEₘₚ ((rule1ₘₚ [LSyₘ] bodyₖ [kaₘ] [kaₚᵣ])
+    FEₘₚ α → FEₘₚ ((rule1ₘₚ [LSABLEₘ] dikaₖ [ka₁ₘ] [kaₚᵣ])
                      α proofₘ proofₖ)
 | wẽMP : ∀ α proofₘ proofₖ,
-    FEₘₚ α → FEₘₚ ((rule1ₘₚ [LSyₘ] plantyₖ [wẽₘ] [wẽₚᵣ])
+    FEₘₚ α → FEₘₚ ((rule1ₘₚ [LSABLEₘ] awẽₖ [wẽₘ] [wẽₚᵣ])
                      α proofₘ proofₖ)
 | dẽMP : ∀ α proofₘ proofₖ,
-    FEₘₚ α → FEₘₚ ((rule1ₘₚ [LSyₘ] eatyₖ [dẽₘ] [dẽₚᵣ])
+    FEₘₚ α → FEₘₚ ((rule1ₘₚ [LSABLEₘ] peẽdẽₖ [dẽₘ] [dẽₚᵣ])
                      α proofₘ proofₖ)
 | kã₁MP : ∀ α proofₘ proofₖ,
-    FEₘₚ α → FEₘₚ ((rule1ₘₚ [LSyₘ] bodyₖ [kã₁ₘ] [kãₚᵣ])
+    FEₘₚ α → FEₘₚ ((rule1ₘₚ [LSABLEₘ] bodyₖ [kã₁ₘ] [kãₚᵣ])
                      α proofₘ proofₖ)
 | kã₂MP : ∀ α proofₘ proofₖ,
-    FEₘₚ α → FEₘₚ ((rule1ₘₚ [LSyₘ] verbₖ [kã₂ₘ] [kãₚᵣ])
+    FEₘₚ α → FEₘₚ ((rule1ₘₚ [PERSONABLEₘ] personₖ [kã₂ₘ] [kãₚᵣ])
                      α proofₘ proofₖ)
 | boMP : ∀ α proofₘ proofₖ,
-    FEₘₚ α → FEₘₚ ((rule1ₘₚ [LSyₘ] verbₖ [boₘ] [boₚᵣ])
+    FEₘₚ α → FEₘₚ ((rule1ₘₚ [PERSONABLEₘ] personₖ [boₘ] [boₚᵣ])
                      α proofₘ proofₖ)
 | bõ₂MP : ∀ α proofₘ proofₖ,
-    FEₘₚ α → FEₘₚ ((rule1ₘₚ [LSyₘ] verbₖ [bõ₂ₘ] [bõₚᵣ])
+    FEₘₚ α → FEₘₚ ((rule1ₘₚ [PERSONABLEₘ] personₖ [bõ₂ₘ] [bõₚᵣ])
                      α proofₘ proofₖ)
 | biMP : ∀ α proofₘ proofₖ,
-    FEₘₚ α → FEₘₚ ((rule1ₘₚ [LSyₘ] verbₖ [biₘ] [biₚᵣ])
+    FEₘₚ α → FEₘₚ ((rule1ₘₚ [PERSONABLEₘ] personₖ [biₘ] [biₚᵣ])
                      α proofₘ proofₖ)
 | bĩMP : ∀ α proofₘ proofₖ,
-    FEₘₚ α → FEₘₚ ((rule1ₘₚ [LSyₘ] verbₖ [bĩₘ] [bĩₚᵣ])
+    FEₘₚ α → FEₘₚ ((rule1ₘₚ [PERSONABLEₘ] personₖ [bĩₘ] [bĩₚᵣ])
                      α proofₘ proofₖ)
 | daMP : ∀ α proofₘ proofₖ,
-    FEₘₚ α → FEₘₚ ((rule1ₘₚ [Doubleableₘ] verbₖ [daₘ] [daₚᵣ])
+    FEₘₚ α → FEₘₚ ((rule1ₘₚ [DUALABLEₘ] personₖ [daₘ] [daₚᵣ])
                      α proofₘ proofₖ)
 | dãMP : ∀ α proofₘ proofₖ,
-    FEₘₚ α → FEₘₚ ((rule1ₘₚ [LSyₘ] verbₖ [dãₘ] [dãₚᵣ])
+    FEₘₚ α → FEₘₚ ((rule1ₘₚ [PERSONABLEₘ] personₖ [dãₘ] [dãₚᵣ])
                      α proofₘ proofₖ)
 | diMP : ∀ α proofₘ proofₖ,
-    FEₘₚ α → FEₘₚ ((rule1ₘₚ [Plurableₘ] verbₖ [diₘ] [di₂ₚᵣ])
+    FEₘₚ α → FEₘₚ ((rule1ₘₚ [PLURALABLEₘ] personₖ [diₘ] [di₂ₚᵣ])
                      α proofₘ proofₖ)
 | paMP : ∀ α proofₘ proofₖ,
-    FEₘₚ α → FEₘₚ ((rule1ₘₚ [Infyₘ] verbₖ [pa₂ₘ] [paₚᵣ])
+    FEₘₚ α → FEₘₚ ((rule1ₘₚ [INFₘ] verbₖ [pa₂ₘ] [paₚᵣ])
                      α proofₘ proofₖ)
 | tapaMP : ∀ α proofₘ proofₖ,
-    FEₘₚ α → FEₘₚ ((rule1ₘₚ [Nirstyₘ] verbₖ [pa₂ₘ ; ta₂ₘ] [paₚᵣ ; taₚᵣ])
+    FEₘₚ α → FEₘₚ ((rule1ₘₚ [NONFIRSTₘ] verbₖ [pa₂ₘ ; ta₂ₘ] [paₚᵣ ; taₚᵣ])
                      α proofₘ proofₖ)
 | tabõMP : ∀ α proofₘ proofₖ,
-    FEₘₚ α → FEₘₚ ((rule1ₘₚ [LSyₘ] verbₖ [bõ₂ₘ ; ta₂ₘ] [bõₚᵣ ; taₚᵣ])
+    FEₘₚ α → FEₘₚ ((rule1ₘₚ [PERSONABLEₘ] verbₖ [bõ₂ₘ ; ta₂ₘ] [bõₚᵣ ; taₚᵣ])
                      α proofₘ proofₖ)
 | taboMP : ∀ α proofₘ proofₖ,
-    FEₘₚ α → FEₘₚ ((rule1ₘₚ [LSyₘ] verbₖ [boₘ ; ta₂ₘ] [boₚᵣ ; taₚᵣ])
+    FEₘₚ α → FEₘₚ ((rule1ₘₚ [PERSONABLEₘ] verbₖ [boₘ ; ta₂ₘ] [boₚᵣ ; taₚᵣ])
                      α proofₘ proofₖ).
 
-(** Anything that is proveably a form paradigm member has a validly
-named compound category. *)
+Example Kẽ₁ₘ_is_FE : FEₘₚ ( [Kẽ₁ₘ], [kẽₚᵣ] ).
+apply kẽMP.
+Qed.
 
-Definition FEM : ∀ α : structₘₚ, FEₘₚ α → Prop :=
-  λ (α : structₘₚ) (_ : FEₘₚ α), Mₘ (fst α).
+(** Anything that is the category of a proveable form paradigm member
+has a validly named compound category. *)
 
-(* I am not yet sure how I want to do this:
+Axiom Mₘ_are_FE_fst : ∀ (cat : list m) (α : structₘₚ), FEₘₚ α → cat = fst α → Mₘ cat.
 
-Fixpoint stemof (α : list m) : option m :=
-  match α with
-  | nil => None
-  | head :: tail =>
-      match (find (eqₘ head) stems) with
-      | None => stemof tail
-      | something => something
-      end
-  end.
-
-Definition optional_stem_eq (α : option m) (β : option m) : bool :=
-  match α, β with
-  | None, _ => false
-  | _, None => false
-  | Some x, Some y => eqₘ x y
-  end.
-
-Definition eq_stem (α : structₘₚ) (β : structₘₚ) : bool :=
-  match α, β with
-  | (x, _), (y, _) => optional_stem_eq (stemof x) (stemof y)
-  end.
-
-Definition S (α : structₘₚ) (β : structₘₚ) : Prop :=
-  eq_stem α β = true.
-
-Inductive FPₘₚ : structₘₚ → structₘₚ → Prop :=
-| inₘₚ : ∀ α β, S α β → FEₘₚ α → FEₘₚ β → FPₘₚ α β
-| 
-*)  
-
+Example Kẽ₁ₘ_is_Mₘ : Mₘ [Kẽ₁ₘ].
+Proof.
+  assert (equal_to_first : ([Kẽ₁ₘ] = fst ([Kẽ₁ₘ], [kẽₚᵣ]))).
+  simpl.
+  reflexivity.
+  apply (Mₘ_are_FE_fst [Kẽ₁ₘ] ( [Kẽ₁ₘ], [kẽₚᵣ] ) Kẽ₁ₘ_is_FE equal_to_first).
+Qed.
+  
 (** Form paradigm string equivalence states that when two structures
 that have process lists that reduce to the same string, they are
 equivalent, so long as their compound categories are valid names.  It
@@ -714,99 +696,310 @@ Inductive equivₘₚ : structₘₚ → structₘₚ → Prop :=
 | transₘₚ : ∀ α β γ, Mₘ (fst α) → Mₘ (fst β) → Mₘ (fst γ) → equivₘₚ α β → equivₘₚ β γ → equivₘₚ α γ
 | str_equivₘₚ : ∀ α β : structₘₚ, Mₘ (fst α) → Mₘ (fst β) → applyₚᵣ (snd α) = applyₚᵣ (snd β) → equivₘₚ α β.
 
-(* I am going to provide this functionality at the interface
-only. Rule schema 2 will not work if I can't trust that there is a
-correspondence between categories and processes at the morphological
-level.
-
-| cat_equivₘₚ : ∀ α β : structₘₚ, Mₘ (fst α) → Mₘ (fst β) → equivₘₚ α
-  β → equivₘₚ α (fst β, snd α).
-*)
-
 Infix "≡ₘₚ" := equivₘₚ (at level 90).
 
-(** Here I wish to prove that not only the left side of the
-equivalence (α) but also the right side (β) has category equivalence.
-If two structures are string equivalent, then the left side structure
-may have its compound category replaced with the compound category of
-the right side structure, as stated in `cat_equivₘₚ'.  Due to the
-symmetric property of the equivalence, the right side structure may
-also have its compound category replaced with the compound category of
-the left side structure. *)
+(** The form paradigm for some lexeme is an equivalence class *)
 
-Lemma rev_cat_equivₘₚ : ∀ α β : structₘₚ, α ≡ₘₚ β → β ≡ₘₚ (fst α, snd
-β).  Proof.  (** The statement `intros α β H' introduces the variables
-and the hypothesis α ≡ₘₚ β.  This results in the following labeled
-hypotheses and goal.  *)
+(* Inductive Pₘₚ : mpₘₚ → mpₘₚ → Prop := *)
+(* | inₘₚ : ∀ α β l, MPₘₚ α l → MPₘₚ β l → Pₘₚ α β *)
+(* | reflₘₚ : ∀ α l, MPₘₚ α l → Pₘₚ α α *)
+(* | transₘₚ : ∀ α β γ, Pₘₚ α β → Pₘₚ β γ → Pₘₚ α γ *)
+(* | symₘₚ : ∀ α β, Pₘₚ α β → Pₘₚ β α. *)
 
-  (** α, β : structₘₚ H : α ≡ₘₚ β ============================ β ≡ₘₚ
-     (fst α, snd β)
+(** Below is a highly simplified phenogrammatical type for LCG. *)
 
-   *) intros α β H.
+Inductive ϕ : Set :=
+| ε
+| η : string → ϕ
+| concatϕ (α β : ϕ).
+
+Infix "•" := concatϕ (at level 60, right associativity).
+
+(** Below is a highly simplified tectogrammatical type for LCG. *)
+
+Inductive τ : Set :=
+| NP
+| N
+| Fin
+| infτ (α β : τ).
+
+(** Below is a portion of Jordan Needle's formalization of Agnostic
+Hyper-intentional Semantics. Much of what makes the theory agnostic
+and hyper-intentional is not provided here. The goal is simply to
+embed the terms of the semantic theory below a single type. The idea
+is to provide an encoding of the types of the many types of the
+semantic theory under an inductive type stat_term, which is a single
+type within Set. The `ent`, `prp` and `func` constructors are simple
+terms of type stat_term and may not have inhabitants. Sns is a
+recursive function that returns a type within Set given a stat_term
+encoding. The stat_term is basically just a syntactic expression of
+the types of the semantic logic. Sns converts that syntactic
+representation into acutal types. *)
+
+(** A number of types for meanings. *)
+
+Axiom big : (e → prop) → e → prop.
+
+Axiom tall : (e → prop) → e → prop.
+
+Axiom head : e → prop.
+
+Axiom rock : e → prop.
+
+Axiom fruit : e → prop.
+
+Axiom thorn : e → prop.
+
+Axiom plant : e → prop.
+
+Axiom pole : e → prop.
+
+Axiom branch : e → prop.
+
+Axiom hurt : e → e → prop.
+
+Axiom say : e → prop → prop.
+
+Axiom liquid : e → prop.
+
+Axiom see : e → e → prop.
+
+Axiom doo : e → prop → prop.
+
+Axiom same : (e → prop) → e → prop.
+
+Axiom cutt : e → e → prop.
+
+Axiom eat : e → prop.
+
+Axiom woman : e → prop.
+
+Axiom plantain : e → prop.
+
+Axiom chonta_palm : e → prop.
+
+Axiom chicha : e → prop.
+
+Axiom canoe : e → prop.
+
+Axiom seed : e → prop.
+
+Axiom food : e → prop.
+
+Axiom body : e → prop.
+
+Axiom meat : e → prop.
+
+Axiom board : e → prop.
+
+Axiom flat_thing : e → prop.
+
+Axiom shell : e → prop.
+
+Axiom paper : e → prop.
+
+Axiom small_flat_thing : e → prop.
+
+Axiom small_round_thing : e → prop.
+
+Axiom round_thing : e → prop.
+
+Axiom hand : e → prop.
+
+Axiom cluster : e → prop.
+
+Axiom past : e → prop.
+
+Axiom future : e → prop.
+
+Axiom trans : e → e → prop.
+
+(** `sense` is a Sigma type, a dependent sum. Σ(x:A), B(x) is the
+notionation written for the constructor. So for { s : stat_term & Sns
+s }, the type corresponds to Σ(s:stat_term), Sns(s). `s` is a stat
+term and `Sns s` is a type "indexed" by `s`, belonging to a family of
+types, in this case `e`, `prop`, and the types of functions of things
+of type `e` and `prop`.
+
+Usually, in the literature, the type is written Σ(x:A), B(x), but
+given that x:A is recoverable from the type of B, the type need only
+invoke the predicate, as below. *)
+
+Definition sense := sigT Sns.
+
+Definition adjsense := existT Sns (func (func ent prp) (func ent prp)).
+
+Definition intranssense := existT Sns (func ent prp).
+
+Definition transsense := existT Sns (func ent (func ent prp)).
+
+Definition to_trans : (e → prop) → (e → e → prop) :=
+  λ _,trans.
+
+Inductive rmeaning : sense → list m → Prop :=
+| bigₛ : ∀ cat, cat = [ Yẽdẽₘ ] → rmeaning (adjsense big) cat
+| tallₛ : ∀ cat, cat = [ Yẽdẽₘ ] → rmeaning (adjsense tall) cat
+| sameₛ : ∀ cat, cat = [ Adoₘ ] → rmeaning (adjsense same) cat
+| thornₛ : ∀ cat, cat = [ Daaₘ ] → rmeaning (intranssense thorn) cat
+| eat_intransₛ : ∀ cat, cat = [ Kẽ₁ₘ ] → rmeaning (intranssense eat) cat
+| womanₛ : ∀ cat, cat = [ Okiyeₘ ] → rmeaning (intranssense woman) cat
+| hurtₛ : ∀ cat, cat = [ Dãtaₘ ] → rmeaning (transsense hurt) cat
+| seeₛ : ∀ cat, cat = [ A₂ₘ ] → rmeaning (transsense see) cat
+| cutₛ : ∀ cat, cat = [ Kẽ₁ₘ ] → rmeaning (transsense cutt) cat
+| eat_transₛ : ∀ cat, cat = [ Kẽ₁ₘ ] → rmeaning (transsense (to_trans eat)) cat.
+
+Inductive lsmeaning : sense → m → Prop :=
+| bõ₁ₛfruit : ∀ m, m = bõ₁ₘ → lsmeaning (intranssense fruit) m
+| bõ₁ₛseed : ∀ m, m = bõ₁ₘ → lsmeaning (intranssense seed) m
+| bõ₁ₛround : ∀ m, m = bõ₁ₘ → lsmeaning (intranssense round_thing) m
+| bõ₁ₛsmall : ∀ m, m = bõ₁ₘ → lsmeaning (intranssense small_round_thing) m
+| ka₁ₛfruit : ∀ m, m = bõ₁ₘ → lsmeaning (intranssense fruit) m
+| ka₁ₛseed : ∀ m, m = bõ₁ₘ → lsmeaning (intranssense seed) m
+| ka₁ₛhead : ∀ m, m = bõ₁ₘ → lsmeaning (intranssense head) m
+| ka₁ₛrock : ∀ m, m = bõ₁ₘ → lsmeaning (intranssense rock) m
+| dẽₛfood : ∀ m, m = dẽₘ → lsmeaning (intranssense food) m
+| pa₁ₛboard : ∀ m, m = pa₁ₘ → lsmeaning (intranssense board) m
+| pa₁ₛflat : ∀ m, m = pa₁ₘ → lsmeaning (intranssense flat_thing) m
+| poₛhand : ∀ m, m = poₘ → lsmeaning (intranssense hand) m
+| poₛcanoe : ∀ m, m = poₘ → lsmeaning (intranssense canoe) m
+| poₛcluster : ∀ m, m = poₘ → lsmeaning (intranssense cluster) m
+| pẽₛliquid : ∀ m, m = pẽₘ → lsmeaning (intranssense liquid) m
+| ta₁ₛshell : ∀ m, m = ta₁ₘ → lsmeaning (intranssense shell) m
+| ta₁ₛpaper : ∀ m, m = ta₁ₘ → lsmeaning (intranssense paper) m
+| wẽₛplant : ∀ m, m = wẽₘ → lsmeaning (intranssense plant) m
+| wẽₛpole : ∀ m, m = wẽₘ → lsmeaning (intranssense pole) m
+| wẽₛbranch : ∀ m, m = wẽₘ → lsmeaning (intranssense branch) m.
+
+Inductive lsrelmeaning : sense → list m → Prop :=
+| ls_adjₛ : ∀ s₁ s₂ s₃ rel cat, klass cat ≤ₖ adjₖ → rmeaning s₁ cat → lsmeaning s₂ (hd noneₘ cat) → rel s₁ s₂ s₃ → lsrelmeaning s₃ cat. 
+
+Axiom sss : e.
+Axiom vvv : prop.
+
+Type (projT2 (intranssense shell)).
+Type ((projT2 (intranssense shell)) sss) and vvv.
+
+Axiom ij : ∀ (s : stat_term) (sns : sense), Sns s → s = projT1 sns → Prop.
+
+Example ij_test : ij (func ent prp) (intranssense shell).
+
+
+
+Definition intersectls : ((e → prop) → e → prop) → (e → prop) → (e → prop) → e → prop :=
+  λ adj ls n x,(adj n x) and (ls x) and (n x).
+
+Inductive meaningrel : sense → sense → sense → Prop :=
+| adjlsinter : ∀ (s₁ : sense) (s₂ : sense), projT1 s₁ = func (func ent prp) (func ent prp) → projT1 s₂ = func ent prp → meaningrel s₁ s₂ (intersectls (projT2 s₁) (projT2 s₂)).
+
+    λ s₁ s₂,existT (Sns (func ent prp) (λ (α : e), (projT2 s₁) α and (projT2 s₂) α)).
+
+Inductive meaning : sense → list m → Prop :=
+| rootₛ : ∀ s cat, cat ≤ₘ [ ROOTₘ ] → rmeaning s cat → meaning s cat
+| lsₛ : ∀ s cat, cat ≤ₘ [ LSₘ ] → lsrelmeaning s cat → meaning s cat.
+
+Example yẽdẽ_fe : FEₘₚ ([ Yẽdẽₘ ], [ yẽdẽₚᵣ ]).
+Proof.
+  apply yẽdẽMP.  
+Qed.
+
+Example Yẽdẽ_is_Mₘ : Mₘ [ Yẽdẽₘ ].
+Proof.
+  assert (equal_to_first : ([Yẽdẽₘ] = fst ([ Yẽdẽₘ ], [ yẽdẽₚᵣ ]))).
+  reflexivity.
+  apply (Mₘ_are_FE_fst [Yẽdẽₘ] ([ Yẽdẽₘ ], [ yẽdẽₚᵣ ]) yẽdẽ_fe equal_to_first).
+Qed.
+
+Example yẽdẽ_is_big : meaning (adjsense big) [ Yẽdẽₘ ].
+Proof.
+  apply root.
+  apply rootₘ.
+  apply Yẽdẽ_is_Mₘ.
+  reflexivity.
+  discriminate.
+  apply bigr.
+  reflexivity.
+Qed.
+
+Example yẽdẽka_fe : FEₘₚ ([ ka₁ₘ ; Yẽdẽₘ ], [ kaₚᵣ ; yẽdẽₚᵣ ]).
+Proof.
+  apply yẽdẽMP.  
+Qed.
+
+Example Yẽdẽka_is_Mₘ : Mₘ [ ka₁ₘ ; Yẽdẽₘ ].
+Proof.
+  assert (equal_to_first : ([ ka₁ₘ ; Yẽdẽₘ ] = fst ([ ka₁ₘ ; Yẽdẽₘ ], [ kaₚᵣ ; yẽdẽₚᵣ ]))).
+  reflexivity.
+  apply (Mₘ_are_FE_fst [ka₁ₘ ; Yẽdẽₘ] ([ ka₁ₘ ; Yẽdẽₘ ], [ kaₚᵣ ; yẽdẽₚᵣ ]) yẽdẽka_fe equal_to_first).
+Qed.
+
+Example yẽdẽka_is_big_rock : meaning (adjsense (big AND rock)) [ ka₁ₘ ; Yẽdẽₘ ].
+Proof.
+  apply root.
+  apply rootₘ.
+  apply Yẽdẽ_is_Mₘ.
+  reflexivity.
+  discriminate.
+  apply bigr.
+  reflexivity.
+Qed.
+
+
+
+
+
+(* The type of sign paradigm entries *)
+
+Definition spₛₚ := (ϕ * τ * sense).
+
+
+(* Definition lexmeaning : list (lₗ * sense) :=  *)
+(*   cons (ñeneₗ, existT Sns (func ent prp) big) *)
+(*        (cons (ñeneₗ, existT Sns (func ent prp) tall) *)
+(*              (cons (giitaₗ, existT Sns (func ent prp) small) nil)). *)
+
+(* Definition catmeaning : list (mₘ * sense) := *)
+(*   cons (poₘ, existT Sns (func ent prp) boat) *)
+(*        (cons (poₘ, existT Sns (func ent prp) hand) nil). *)
+
+(* Definition conjmeaning (α β : e → prop) : (e → prop) := *)
+(*   λ γ,(α γ) AND (β γ). *)
   
-  (** The statement `apply symₘₚ in H' applies the type constructor to
-  the hypothesis H.
+(* Inductive meaning : sense → lₗ → mₘ → Prop := *)
+(*   m₁ : ∀ s l m, m = baseₘ → In (l, s) lexmeaning → meaning s l m *)
+(* | m₂ : ∀ (s₁ : e → prop) (s₂ : e → prop) l m, *)
+(*     m = poₘ → *)
+(*     In (l, existT Sns (func ent prp) s₁) lexmeaning → *)
+(*     In (m, existT Sns (func ent prp) s₂) catmeaning → *)
+(*     meaning (existT Sns (func ent prp) (conjmeaning s₁ s₂)) l m. *)
 
-     This results in the order of the variables in the hypothesis H
-   being flipped.  *)
 
-  (** α, β : structₘₚ H : β ≡ₘₚ α ============================ β ≡ₘₚ
-     (fst α, snd β)
+Inductive meaning : sense → list mₘ → Prop :=
+  m₁ : ∀ s m, m = [ROOTₘ] → In s lexmeaning → meaning s m
+| m₂ : ∀ (s₁ : e → prop) (s₂ : e → prop) l m,
+    m = poₘ →
+    In (l, existT Sns (func ent prp) s₁) lexmeaning →
+    In (m, existT Sns (func ent prp) s₂) catmeaning →
+    meaning (existT Sns (func ent prp) (conjmeaning s₁ s₂)) l m.
 
-   *) apply symₘₚ in H.
-  
-  (* The statement `apply cat_equivₘₚ in H' applies the type
-  constructor to the hypothesis H.
+(** A type alias for an LCG sign. *)
 
-     This results in the hypothesis H being identical to the goal.
+(** A rule schema for form to sign mappings. *)
 
-     α, β : structₘₚ H : β ≡ₘₚ (fst α, snd β)
-     ============================ β ≡ₘₚ (fst α, snd β)
+Definition ruleₛₚ (catₘ : list m) (kₖ : K) (t : τ) (s : stat_term) :=
+  λ (α : structₘₚ)
+    (fe : FEₘₚ α)
+    (ss : stat_term)
+    (β : Sns ss)
+    (γ : Sns ss → Sns s)
+    (proofₘ : (fst α) ≤ₘ catₘ)
+    (proofₖ : klass (fst α) ≤ₖ kₖ)
+    (proofₛ : meaning (existT Sns ss β) (fst α)),
+    (η (applyₚᵣ (snd α)), t, existT Sns s (γ β)).
 
-   *) apply cat_equivₘₚ in H.
+(** A sign paradigm is an equivalence class. *)
 
-  (* The `assumption' tactic causes the proof assistant to look for a
-     type that is convertable to the goal in the context.  In this
-     case H is trivially convertable.  *) assumption.  Qed.
-
-(** The next two proofs demonstrate that the string equivalence
-definition results in the equivalence of the processes that produced
-the identical strings. *)
-
-Lemma proc_equivₘₚ : ∀ α β : structₘₚ, α ≡ₘₚ β → α ≡ₘₚ (fst α, snd β).
-Proof.  intros α β H.
-
-  (* The statement `apply rev_cat_equivₘₚ in H as I' applies the
-     previous lemma to the hypothesis H.  The result of the
-     application is labeled I so that both hypothesis can be
-     referenced later.
-
-     The result is the following set of hypotheses and goals.
-
-     α, β : structₘₚ H : α ≡ₘₚ β I : β ≡ₘₚ (fst α, snd β)
-     ============================ α ≡ₘₚ (fst α, snd β) *) apply
-     rev_cat_equivₘₚ in H as I.
-
-  (* The statement `apply transₘₚ with α β (fst α, snd β) in I'
-  applies the type constructor for transitivity, explicitly specifying
-  the arguments.
-
-     This results in I being identical to goal.  The proof assistant
-     requires the second goal to be proven due to the definition of
-     `transₘₚ'.  The second goal corresponds to H.  Both goals can be
-     solved by assumption.
-
-     α, β : structₘₚ H : α ≡ₘₚ β I : α ≡ₘₚ (fst α, snd β)
-     ============================ α ≡ₘₚ (fst α, snd β)
-
-     goal 2 is: α ≡ₘₚ β
- 
-   *) apply transₘₚ with α β (fst α, snd β) in I.  assumption.
-  assumption.  Qed.
-
-(** The lemma for the reverse case of `proc_equivₘₚ' only requires the
-symmetric property of `≡ₘₚ' to be proven. *)
-
-Lemma rev_proc_equivₘₚ : ∀ α β : structₘₚ, α ≡ₘₚ β → β ≡ₘₚ (fst β, snd
-α).  Proof.  intros α β H.  apply symₘₚ in H.  apply proc_equivₘₚ in H
-as I.  assumption.  Qed.
+Inductive Pₛₚ : spₛₚ → spₛₚ → Prop :=
+| inₛₚ : ∀ α β l, SPₛₚ α l → SPₛₚ β l → Pₛₚ α β
+| reflₛₚ : ∀ α l, SPₛₚ α l → Pₛₚ α α
+| transₛₚ : ∀ α β γ, Pₛₚ α β → Pₛₚ β γ → Pₛₚ α γ
+| symₛₚ : ∀ α β, Pₛₚ α β -> Pₛₚ β α.

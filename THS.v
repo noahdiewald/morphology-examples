@@ -9,6 +9,8 @@
     1. replace facts_inj, make world its own primitive type which maps to {f : pset | ultrafilter f}, quotient relation to make proof irrelevance fall out
     2. maybe try a version with the hyperintensional type i for individual concepts, with extension type e *)
 
+Require Import Coq.Unicode.Utf8.
+
 
 (* Assumptions for the signature of the theory *)
 Section Primitives.
