@@ -814,6 +814,12 @@ Axiom future : e → prop.
 
 Axiom trans : e → e → prop.
 
+Axiom onenoun : e → prop.
+
+Axiom to_trans : (e → prop) → (e → e → prop).
+
+Axiom ι : (e → prop) → e.
+
 (** `sense` is a Sigma type, a dependent sum. Σ(x:A), B(x) is the
 notionation written for the constructor. So for { s : stat_term & Sns
 s }, the type corresponds to Σ(s:stat_term), Sns(s). `s` is a stat
@@ -833,69 +839,57 @@ Definition intranssense := existT Sns (func ent prp).
 
 Definition transsense := existT Sns (func ent (func ent prp)).
 
-Definition to_trans : (e → prop) → (e → e → prop) :=
-  λ _,trans.
-
-Inductive rmeaning : sense → list m → Prop :=
-| bigₛ : ∀ cat, cat = [ Yẽdẽₘ ] → rmeaning (adjsense big) cat
-| tallₛ : ∀ cat, cat = [ Yẽdẽₘ ] → rmeaning (adjsense tall) cat
-| sameₛ : ∀ cat, cat = [ Adoₘ ] → rmeaning (adjsense same) cat
-| thornₛ : ∀ cat, cat = [ Daaₘ ] → rmeaning (intranssense thorn) cat
-| eat_intransₛ : ∀ cat, cat = [ Kẽ₁ₘ ] → rmeaning (intranssense eat) cat
-| womanₛ : ∀ cat, cat = [ Okiyeₘ ] → rmeaning (intranssense woman) cat
-| hurtₛ : ∀ cat, cat = [ Dãtaₘ ] → rmeaning (transsense hurt) cat
-| seeₛ : ∀ cat, cat = [ A₂ₘ ] → rmeaning (transsense see) cat
-| cutₛ : ∀ cat, cat = [ Kẽ₁ₘ ] → rmeaning (transsense cutt) cat
-| eat_transₛ : ∀ cat, cat = [ Kẽ₁ₘ ] → rmeaning (transsense (to_trans eat)) cat.
-
-Inductive lsmeaning : sense → m → Prop :=
-| bõ₁ₛfruit : ∀ m, m = bõ₁ₘ → lsmeaning (intranssense fruit) m
-| bõ₁ₛseed : ∀ m, m = bõ₁ₘ → lsmeaning (intranssense seed) m
-| bõ₁ₛround : ∀ m, m = bõ₁ₘ → lsmeaning (intranssense round_thing) m
-| bõ₁ₛsmall : ∀ m, m = bõ₁ₘ → lsmeaning (intranssense small_round_thing) m
-| ka₁ₛfruit : ∀ m, m = bõ₁ₘ → lsmeaning (intranssense fruit) m
-| ka₁ₛseed : ∀ m, m = bõ₁ₘ → lsmeaning (intranssense seed) m
-| ka₁ₛhead : ∀ m, m = bõ₁ₘ → lsmeaning (intranssense head) m
-| ka₁ₛrock : ∀ m, m = bõ₁ₘ → lsmeaning (intranssense rock) m
-| dẽₛfood : ∀ m, m = dẽₘ → lsmeaning (intranssense food) m
-| pa₁ₛboard : ∀ m, m = pa₁ₘ → lsmeaning (intranssense board) m
-| pa₁ₛflat : ∀ m, m = pa₁ₘ → lsmeaning (intranssense flat_thing) m
-| poₛhand : ∀ m, m = poₘ → lsmeaning (intranssense hand) m
-| poₛcanoe : ∀ m, m = poₘ → lsmeaning (intranssense canoe) m
-| poₛcluster : ∀ m, m = poₘ → lsmeaning (intranssense cluster) m
-| pẽₛliquid : ∀ m, m = pẽₘ → lsmeaning (intranssense liquid) m
-| ta₁ₛshell : ∀ m, m = ta₁ₘ → lsmeaning (intranssense shell) m
-| ta₁ₛpaper : ∀ m, m = ta₁ₘ → lsmeaning (intranssense paper) m
-| wẽₛplant : ∀ m, m = wẽₘ → lsmeaning (intranssense plant) m
-| wẽₛpole : ∀ m, m = wẽₘ → lsmeaning (intranssense pole) m
-| wẽₛbranch : ∀ m, m = wẽₘ → lsmeaning (intranssense branch) m.
-
-Inductive lsrelmeaning : sense → list m → Prop :=
-| ls_adjₛ : ∀ s₁ s₂ s₃ rel cat, klass cat ≤ₖ adjₖ → rmeaning s₁ cat → lsmeaning s₂ (hd noneₘ cat) → rel s₁ s₂ s₃ → lsrelmeaning s₃ cat. 
-
-Axiom sss : e.
-Axiom vvv : prop.
-
-Type (projT2 (intranssense shell)).
-Type ((projT2 (intranssense shell)) sss) and vvv.
-
-Axiom ij : ∀ (s : stat_term) (sns : sense), Sns s → s = projT1 sns → Prop.
-
-Example ij_test : ij (func ent prp) (intranssense shell).
-
-
-
 Definition intersectls : ((e → prop) → e → prop) → (e → prop) → (e → prop) → e → prop :=
   λ adj ls n x,(adj n x) and (ls x) and (n x).
 
-Inductive meaningrel : sense → sense → sense → Prop :=
-| adjlsinter : ∀ (s₁ : sense) (s₂ : sense), projT1 s₁ = func (func ent prp) (func ent prp) → projT1 s₂ = func ent prp → meaningrel s₁ s₂ (intersectls (projT2 s₁) (projT2 s₂)).
+Inductive lsmeaning : (e → prop) → m → Prop :=
+| bõ₁ₛfruit : ∀ m, m = bõ₁ₘ → lsmeaning fruit m
+| bõ₁ₛseed : ∀ m, m = bõ₁ₘ → lsmeaning seed m
+| bõ₁ₛround : ∀ m, m = bõ₁ₘ → lsmeaning round_thing m
+| bõ₁ₛsmall : ∀ m, m = bõ₁ₘ → lsmeaning small_round_thing m
+| ka₁ₛfruit : ∀ m, m = bõ₁ₘ → lsmeaning fruit m
+| ka₁ₛseed : ∀ m, m = bõ₁ₘ → lsmeaning seed m
+| ka₁ₛhead : ∀ m, m = bõ₁ₘ → lsmeaning head m
+| ka₁ₛrock : ∀ m, m = bõ₁ₘ → lsmeaning rock m
+| dẽₛfood : ∀ m, m = dẽₘ → lsmeaning food m
+| pa₁ₛboard : ∀ m, m = pa₁ₘ → lsmeaning board m
+| pa₁ₛflat : ∀ m, m = pa₁ₘ → lsmeaning flat_thing m
+| poₛhand : ∀ m, m = poₘ → lsmeaning hand m
+| poₛcanoe : ∀ m, m = poₘ → lsmeaning canoe m
+| poₛcluster : ∀ m, m = poₘ → lsmeaning cluster m
+| pẽₛliquid : ∀ m, m = pẽₘ → lsmeaning liquid m
+| ta₁ₛshell : ∀ m, m = ta₁ₘ → lsmeaning shell m
+| ta₁ₛpaper : ∀ m, m = ta₁ₘ → lsmeaning paper m
+| wẽₛplant : ∀ m, m = wẽₘ → lsmeaning plant m
+| wẽₛpole : ∀ m, m = wẽₘ → lsmeaning pole m
+| wẽₛbranch : ∀ m, m = wẽₘ → lsmeaning branch m.
 
-    λ s₁ s₂,existT (Sns (func ent prp) (λ (α : e), (projT2 s₁) α and (projT2 s₂) α)).
+Inductive inmeaning : (e → prop) → list m → Prop :=
+| thornₛ : ∀ cat, cat = [ Daaₘ ] → inmeaning thorn cat
+| eat_intransₛ : ∀ cat, cat = [ Kẽ₁ₘ ] → inmeaning eat cat
+| womanₛ : ∀ cat, cat = [ Okiyeₘ ] → inmeaning woman cat.
+
+Inductive trmeaning : (e → e → prop) → list m → Prop :=
+| hurtₛ : ∀ cat, cat = [ Dãtaₘ ] → trmeaning hurt cat
+| seeₛ : ∀ cat, cat = [ A₂ₘ ] → trmeaning see cat
+| cutₛ : ∀ cat, cat = [ Kẽ₁ₘ ] → trmeaning cutt cat
+| eat_transₛ : ∀ cat, cat = [ Kẽ₁ₘ ] → trmeaning (to_trans eat) cat.
+
+Inductive adjmeaning : ((e → prop) → e → prop) → list m → Prop :=
+| bigₛ : ∀ cat, cat = [ Yẽdẽₘ ] → adjmeaning big cat
+| tallₛ : ∀ cat, cat = [ Yẽdẽₘ ] → adjmeaning tall cat
+| sameₛ : ∀ cat, cat = [ Adoₘ ] → adjmeaning same cat
+| adjlsₛ : ∀ cat α β, cat ≤ₘ [ LSₘ ] → lsmeaning α (hd noneₘ cat) → adjmeaning β (tail cat) → adjmeaning (intersectls β α) cat.
+
+Inductive emeaning : e → list m → Prop :=
+| definite_adjₛ : ∀ cat (α : (e → prop) → e → prop), adjmeaning α cat → emeaning (ι (α onenoun)) cat
+| definite_nounₛ : ∀ cat (α : e → prop), inmeaning α cat → emeaning (ι α) cat.
 
 Inductive meaning : sense → list m → Prop :=
-| rootₛ : ∀ s cat, cat ≤ₘ [ ROOTₘ ] → rmeaning s cat → meaning s cat
-| lsₛ : ∀ s cat, cat ≤ₘ [ LSₘ ] → lsrelmeaning s cat → meaning s cat.
+| eₛ : ∀ cat (α : e), emeaning α cat → rmeaning (existT Sns ent α) cat
+| inₛ : ∀ cat (α : e → prop), inmeaning α cat → rmeaning (intranssense α) cat
+| trₛ : ∀ cat (α : e → e → prop), trmeaning α cat → rmeaning (transsense α) cat
+| adjₛ : ∀ cat (α : (e → prop) → e → prop), adjmeaning α cat → rmeaning (adjsense α) cat.
 
 Example yẽdẽ_fe : FEₘₚ ([ Yẽdẽₘ ], [ yẽdẽₚᵣ ]).
 Proof.
