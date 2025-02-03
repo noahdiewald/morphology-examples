@@ -698,31 +698,6 @@ Inductive equivₘₚ : structₘₚ → structₘₚ → Prop :=
 
 Infix "≡ₘₚ" := equivₘₚ (at level 90).
 
-(** The form paradigm for some lexeme is an equivalence class *)
-
-(* Inductive Pₘₚ : mpₘₚ → mpₘₚ → Prop := *)
-(* | inₘₚ : ∀ α β l, MPₘₚ α l → MPₘₚ β l → Pₘₚ α β *)
-(* | reflₘₚ : ∀ α l, MPₘₚ α l → Pₘₚ α α *)
-(* | transₘₚ : ∀ α β γ, Pₘₚ α β → Pₘₚ β γ → Pₘₚ α γ *)
-(* | symₘₚ : ∀ α β, Pₘₚ α β → Pₘₚ β α. *)
-
-(** Below is a highly simplified phenogrammatical type for LCG. *)
-
-Inductive ϕ : Set :=
-| ε
-| η : string → ϕ
-| concatϕ (α β : ϕ).
-
-Infix "•" := concatϕ (at level 60, right associativity).
-
-(** Below is a highly simplified tectogrammatical type for LCG. *)
-
-Inductive τ : Set :=
-| NP
-| N
-| Fin
-| infτ (α β : τ).
-
 (** Below is a portion of Jordan Needle's formalization of Agnostic
 Hyper-intentional Semantics. Much of what makes the theory agnostic
 and hyper-intentional is not provided here. The goal is simply to
@@ -847,10 +822,10 @@ Inductive lsmeaning : (e → prop) → m → Prop :=
 | bõ₁ₛseed : ∀ m, m = bõ₁ₘ → lsmeaning seed m
 | bõ₁ₛround : ∀ m, m = bõ₁ₘ → lsmeaning round_thing m
 | bõ₁ₛsmall : ∀ m, m = bõ₁ₘ → lsmeaning small_round_thing m
-| ka₁ₛfruit : ∀ m, m = bõ₁ₘ → lsmeaning fruit m
-| ka₁ₛseed : ∀ m, m = bõ₁ₘ → lsmeaning seed m
-| ka₁ₛhead : ∀ m, m = bõ₁ₘ → lsmeaning head m
-| ka₁ₛrock : ∀ m, m = bõ₁ₘ → lsmeaning rock m
+| ka₁ₛfruit : ∀ m, m = ka₁ₘ → lsmeaning fruit m
+| ka₁ₛseed : ∀ m, m = ka₁ₘ → lsmeaning seed m
+| ka₁ₛhead : ∀ m, m = ka₁ₘ → lsmeaning head m
+| ka₁ₛrock : ∀ m, m = ka₁ₘ → lsmeaning rock m
 | dẽₛfood : ∀ m, m = dẽₘ → lsmeaning food m
 | pa₁ₛboard : ∀ m, m = pa₁ₘ → lsmeaning board m
 | pa₁ₛflat : ∀ m, m = pa₁ₘ → lsmeaning flat_thing m
@@ -886,10 +861,10 @@ Inductive emeaning : e → list m → Prop :=
 | definite_nounₛ : ∀ cat (α : e → prop), inmeaning α cat → emeaning (ι α) cat.
 
 Inductive meaning : sense → list m → Prop :=
-| eₛ : ∀ cat (α : e), emeaning α cat → rmeaning (existT Sns ent α) cat
-| inₛ : ∀ cat (α : e → prop), inmeaning α cat → rmeaning (intranssense α) cat
-| trₛ : ∀ cat (α : e → e → prop), trmeaning α cat → rmeaning (transsense α) cat
-| adjₛ : ∀ cat (α : (e → prop) → e → prop), adjmeaning α cat → rmeaning (adjsense α) cat.
+| eₛ : ∀ cat (α : e), emeaning α cat → meaning (existT Sns ent α) cat
+| inₛ : ∀ cat (α : e → prop), inmeaning α cat → meaning (intranssense α) cat
+| trₛ : ∀ cat (α : e → e → prop), trmeaning α cat → meaning (transsense α) cat
+| adjₛ : ∀ cat (α : (e → prop) → e → prop), adjmeaning α cat → meaning (adjsense α) cat.
 
 Example yẽdẽ_fe : FEₘₚ ([ Yẽdẽₘ ], [ yẽdẽₚᵣ ]).
 Proof.
@@ -905,18 +880,48 @@ Qed.
 
 Example yẽdẽ_is_big : meaning (adjsense big) [ Yẽdẽₘ ].
 Proof.
-  apply root.
-  apply rootₘ.
+  apply adjₛ.
+  apply bigₛ.
+  reflexivity.
+Qed.
+
+Example adj_le_dika : adjₖ ≤ₖ dikaₖ.
+  assert (thingdika : thingₖ ≤ₖ dikaₖ).
+  apply (transₖ thingₖ bodyₖ dikaₖ).
+  apply (rulesₖ thingₖ bodyₖ).
+  reflexivity.
+  apply (rulesₖ bodyₖ dikaₖ).
+  reflexivity.
+  apply (transₖ adjₖ thingₖ dikaₖ).
+  apply (rulesₖ adjₖ thingₖ).
+  reflexivity.
+  apply thingdika.
+Qed.
+
+Example yẽdẽ_lsable : [Yẽdẽₘ] ≤ₘ [LSABLEₘ].
+  assert (lsableroot : [ ROOTₘ ] ≤ₘ [ LSABLEₘ ]).
+  apply (singleₘ [ Yẽdẽₘ ]).
+  apply Yẽdẽ_is_Mₘ.
+  simpl.
+  apply (rulesₖ adjₖ singlelsₖ).
+  reflexivity.
+  apply (transₘ [Yẽdẽₘ] [ ROOTₘ ] [ LSABLEₘ ]).
+  apply Yẽdẽ_is_Mₘ.
+  apply Mₘ_abstractsₘ.
+  reflexivity.  
+  apply Mₘ_abstractsₘ.
+  reflexivity.  
+  apply (rootₘ [Yẽdẽₘ]).
   apply Yẽdẽ_is_Mₘ.
   reflexivity.
   discriminate.
-  apply bigr.
-  reflexivity.
+  apply lsableroot.
 Qed.
 
 Example yẽdẽka_fe : FEₘₚ ([ ka₁ₘ ; Yẽdẽₘ ], [ kaₚᵣ ; yẽdẽₚᵣ ]).
 Proof.
-  apply yẽdẽMP.  
+  apply (kaMP ([ Yẽdẽₘ ], [ yẽdẽₚᵣ ]) yẽdẽ_lsable adj_le_dika).
+  apply yẽdẽ_fe.
 Qed.
 
 Example Yẽdẽka_is_Mₘ : Mₘ [ ka₁ₘ ; Yẽdẽₘ ].
@@ -926,74 +931,82 @@ Proof.
   apply (Mₘ_are_FE_fst [ka₁ₘ ; Yẽdẽₘ] ([ ka₁ₘ ; Yẽdẽₘ ], [ kaₚᵣ ; yẽdẽₚᵣ ]) yẽdẽka_fe equal_to_first).
 Qed.
 
-Example yẽdẽka_is_big_rock : meaning (adjsense (big AND rock)) [ ka₁ₘ ; Yẽdẽₘ ].
+Example yẽdẽka_is_big_rock : meaning (adjsense (λ n x,(big n x) and (rock x) and (n x))) [ ka₁ₘ ; Yẽdẽₘ ].
 Proof.
-  apply root.
+  apply (adjₛ [ ka₁ₘ ; Yẽdẽₘ ] (λ n x,(big n x) and (rock x) and (n x))).
+  apply (adjlsₛ [ ka₁ₘ ; Yẽdẽₘ ] rock big).
+  apply (lsₘ [ ka₁ₘ ; Yẽdẽₘ ]).
+  apply Yẽdẽka_is_Mₘ.
+  reflexivity.
+  simpl.
+  apply (ka₁ₛrock ka₁ₘ).
+  reflexivity.
+  simpl.
+  apply (bigₛ [Yẽdẽₘ]).
+  reflexivity.
+Qed.
+
+(** Below is a highly simplified phenogrammatical type for LCG. *)
+
+Inductive ϕ : Set :=
+| ε
+| η : string → ϕ
+| xϕ
+| yϕ
+| zϕ
+| fϕ (α β : ϕ)
+| concatϕ (α β : ϕ).
+
+Infix "•" := concatϕ (at level 60, right associativity).
+
+(** Below is a highly simplified tectogrammatical type for LCG. *)
+
+Inductive τ : Set :=
+| NP
+| N
+| Fin
+| infτ (α β : τ).
+
+Infix "⊸" := infτ (at level 60, right associativity).
+
+(* The type of sign paradigm entries *)
+
+Definition structₛₚ := (ϕ * τ * sense).
+
+(** A rule schema for form to sign mappings. *)
+
+Definition ruleₛₚ (catₘ : list m) (k : K) (P : ϕ → ϕ) (t : τ) (s₁ : stat_term) (s₂ : stat_term) (β : Sns s₁) (Q : Sns s₁ → Sns s₂) :=
+  λ (mp₁ : structₘₚ)
+    (mp₂ : structₘₚ)
+    (proofₑᵥ : mp₁ ≡ₘₚ mp₂)
+    (proofₘ : (fst mp₂) ≤ₘ catₘ)
+    (proofₖ : klass (fst mp₂) ≤ₖ k)
+    (proofₛ : meaning (existT Sns s₁ β) (fst mp₂)),
+    (P (η( applyₚᵣ (snd mp₂) idₚᵣ)), t, existT Sns s₂ (Q β)).
+
+Inductive SEₛₚ : structₛₚ → Prop :=
+| adjmodSP : ∀ mp₁ mp₂ proofₑᵥ proofₘ proofₖ proofₛ,
+    SEₛₚ ((ruleₛₚ [ROOTₘ] adjₖ (λ s,s•xϕ) (N ⊸ N)
+             (func (func ent prp) (func ent prp))
+             (func (func ent prp) (func ent prp))
+             big (λ x,x))
+            mp₁ mp₂ proofₑᵥ proofₘ proofₖ proofₛ).
+
+Example yẽdẽSE : SEₛₚ (η "yẽdẽ" • xϕ, N ⊸ N, adjsense big).
+Proof.
+  assert (equivyẽdẽ : ([ Yẽdẽₘ ], [ yẽdẽₚᵣ ]) ≡ₘₚ ([ Yẽdẽₘ ], [ yẽdẽₚᵣ ])).
+  apply reflₘₚ.
+  simpl.
+  apply Yẽdẽ_is_Mₘ.
+  assert (yẽdẽroot : [Yẽdẽₘ] ≤ₘ [ROOTₘ]).
   apply rootₘ.
   apply Yẽdẽ_is_Mₘ.
   reflexivity.
   discriminate.
-  apply bigr.
-  reflexivity.
+  assert (yẽdẽadj : klass [Yẽdẽₘ] ≤ₖ adjₖ).
+  simpl.
+  apply reflₖ.
+  assert (yẽdẽmean : meaning (existT Sns (func (func ent prp) (func ent prp)) big) [Yẽdẽₘ]).
+  apply yẽdẽ_is_big.
+  apply (adjmodSP ([ Yẽdẽₘ ], [ yẽdẽₚᵣ ]) ([ Yẽdẽₘ ], [ yẽdẽₚᵣ ]) equivyẽdẽ yẽdẽroot yẽdẽadj yẽdẽmean).
 Qed.
-
-
-
-
-
-(* The type of sign paradigm entries *)
-
-Definition spₛₚ := (ϕ * τ * sense).
-
-
-(* Definition lexmeaning : list (lₗ * sense) :=  *)
-(*   cons (ñeneₗ, existT Sns (func ent prp) big) *)
-(*        (cons (ñeneₗ, existT Sns (func ent prp) tall) *)
-(*              (cons (giitaₗ, existT Sns (func ent prp) small) nil)). *)
-
-(* Definition catmeaning : list (mₘ * sense) := *)
-(*   cons (poₘ, existT Sns (func ent prp) boat) *)
-(*        (cons (poₘ, existT Sns (func ent prp) hand) nil). *)
-
-(* Definition conjmeaning (α β : e → prop) : (e → prop) := *)
-(*   λ γ,(α γ) AND (β γ). *)
-  
-(* Inductive meaning : sense → lₗ → mₘ → Prop := *)
-(*   m₁ : ∀ s l m, m = baseₘ → In (l, s) lexmeaning → meaning s l m *)
-(* | m₂ : ∀ (s₁ : e → prop) (s₂ : e → prop) l m, *)
-(*     m = poₘ → *)
-(*     In (l, existT Sns (func ent prp) s₁) lexmeaning → *)
-(*     In (m, existT Sns (func ent prp) s₂) catmeaning → *)
-(*     meaning (existT Sns (func ent prp) (conjmeaning s₁ s₂)) l m. *)
-
-
-Inductive meaning : sense → list mₘ → Prop :=
-  m₁ : ∀ s m, m = [ROOTₘ] → In s lexmeaning → meaning s m
-| m₂ : ∀ (s₁ : e → prop) (s₂ : e → prop) l m,
-    m = poₘ →
-    In (l, existT Sns (func ent prp) s₁) lexmeaning →
-    In (m, existT Sns (func ent prp) s₂) catmeaning →
-    meaning (existT Sns (func ent prp) (conjmeaning s₁ s₂)) l m.
-
-(** A type alias for an LCG sign. *)
-
-(** A rule schema for form to sign mappings. *)
-
-Definition ruleₛₚ (catₘ : list m) (kₖ : K) (t : τ) (s : stat_term) :=
-  λ (α : structₘₚ)
-    (fe : FEₘₚ α)
-    (ss : stat_term)
-    (β : Sns ss)
-    (γ : Sns ss → Sns s)
-    (proofₘ : (fst α) ≤ₘ catₘ)
-    (proofₖ : klass (fst α) ≤ₖ kₖ)
-    (proofₛ : meaning (existT Sns ss β) (fst α)),
-    (η (applyₚᵣ (snd α)), t, existT Sns s (γ β)).
-
-(** A sign paradigm is an equivalence class. *)
-
-Inductive Pₛₚ : spₛₚ → spₛₚ → Prop :=
-| inₛₚ : ∀ α β l, SPₛₚ α l → SPₛₚ β l → Pₛₚ α β
-| reflₛₚ : ∀ α l, SPₛₚ α l → Pₛₚ α α
-| transₛₚ : ∀ α β γ, Pₛₚ α β → Pₛₚ β γ → Pₛₚ α γ
-| symₛₚ : ∀ α β, Pₛₚ α β -> Pₛₚ β α.
