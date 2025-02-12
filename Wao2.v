@@ -63,8 +63,8 @@ Inductive m : Set :=
 | ka₁ₘ (* The 'fruit' lexical suffix. *)
 | kã₁ₘ (* The 'body' lexical suffix. *)
 | pa₁ₘ (* The 'board' lexical suffix. *)
-| poₘ (* The 'hand' lexical suffix. *)
 | pẽₘ (* The 'liquid' lexical suffix. *)
+| poₘ (* The 'hand' lexical suffix. *)
 | ta₁ₘ (* The 'shell' lexical suffix. *)
 | wẽₘ (* The 'plant' lexical suffix. *)
 | yaboₘ (* The 'leaf' lexical suffix. *)
@@ -87,6 +87,7 @@ Inductive m : Set :=
 | ke₂ₘ (* The limitive suffix. *)
 | ka₂ₘ (* The instrumental suffix. *)
 (* Abstract m categories. *)
+| CLOSEABLEₘ
 | DUALABLEₘ (* A stem for the dual. *)
 | FIRSTₘ (* A stem with the first singular. *)
 | GERABLEₘ (* A stem for the gerund. *)
@@ -416,12 +417,14 @@ Fixpoint inabbₘ (α : m) (β : m) (l : list (list m * list m)) : bool :=
 (** Relationships between abstract Mₘ, which may be shared by all form classes. *)
 
 Definition abstract_leₘ_rulesₘ : (list (list m * list m)) :=
-  [ ([ ROOTₘ ],[ PERSONABLEₘ ]) ;
-    ([ ROOTₘ ], [ DUALABLEₘ ]) ; (* Although not all roots take person
+  [ ([ ROOTₘ ], [ PERSONABLEₘ ]) ;
+    ([ PERSONABLEₘ ], [ DUALABLEₘ ]) ; (* Although not all roots take person
     affixes, most do and those that don't will be of the wrong form
     class for this ordering to matter. *)
     ([ NUMBERABLEₘ ], [ DUALABLEₘ]) ;
-    ([ NUMBERABLEₘ ], [ PLURALABLEₘ ])
+    ([ NUMBERABLEₘ ], [ PLURALABLEₘ ]) ;
+    ([ PERSONABLEₘ ], [ CLOSEABLEₘ ]) ;
+    ([ PERSONₘ ], [ CLOSEABLEₘ ])
   ].
 
 Definition inabₘ (α : list m) (β : list m) : bool :=
@@ -672,6 +675,40 @@ Definition combineₘₚ (newₘ prevₘ : list m) (newₚᵣ prevₚᵣ : list 
          end
   end.
 
+Definition isStemₘₚ (stemₘₚ wordₘₚ : structₘₚ) : Prop :=
+  let stemₘ := rev (fst stemₘₚ) in
+  let stemₚᵣ := rev (snd stemₘₚ) in
+  let lengthₘ := length stemₘ in
+  let lengthₚᵣ := length stemₚᵣ in
+  let wordₘ := firstn lengthₘ (rev (fst wordₘₚ)) in
+  let wordₚᵣ := firstn lengthₚᵣ (rev (snd wordₘₚ)) in
+  stemₘ = wordₘ ∧ stemₚᵣ = wordₚᵣ.
+
+Example yede_stem_yedeka : isStemₘₚ ([ Yẽdẽₘ ], [ yẽdẽₚᵣ ]) ([ ka₁ₘ ; Yẽdẽₘ ], [ kaₚᵣ ; yẽdẽₚᵣ ]).
+Proof.
+  compute.
+  split.
+  reflexivity.
+  reflexivity.
+Qed.
+
+Definition removeₘₚ (stemₘₚ wordₘₚ : structₘₚ) : structₘₚ :=
+  let stemₘ := fst stemₘₚ in
+  let stemₚᵣ := snd stemₘₚ in
+  let lₘ := length stemₘ in
+  let lₚᵣ := length stemₚᵣ in
+  let wordₘ := fst wordₘₚ in
+  let wordₚᵣ := snd wordₘₚ in
+  let newₘ := skipn lₘ (rev wordₘ) in
+  let newₚᵣ := skipn lₚᵣ (rev wordₚᵣ) in
+  (newₘ, newₚᵣ).
+
+Example taken_stem : (removeₘₚ ([ Yẽdẽₘ ], [ yẽdẽₚᵣ ]) ([ ka₁ₘ ; Yẽdẽₘ ], [ kaₚᵣ ; yẽdẽₚᵣ ])) = ([ ka₁ₘ ], [ kaₚᵣ ]).
+Proof.
+  compute.
+  reflexivity.
+Qed.
+
 (** A form to form mapping rule has the following structure.  There is
 an input compound category, a form class constraint, a new category
 that will be added to the compound category and a new process to be
@@ -706,6 +743,7 @@ Definition rule2ₘₚ (catₘ : list m) (κ : K) (newₘ : list m) (newₚᵣ :
 (* The inductive definition of valid form entries. *)
 
 Inductive FEₘₚ : structₘₚ → Prop :=
+| interchangeMP : ∀ (s₁ s₂ s₃ s₄ : structₘₚ) (κ : K),FEₘₚ s₃ → κ = klass (fst s₁) → κ = klass (fst s₂) → κ = klass (fst s₃) → isStemₘₚ s₁ s₃ → s₄ = combineₘₚ (fst s₂) (fst (removeₘₚ s₁ s₃)) (snd s₂) (snd (removeₘₚ s₁ s₃)) → FEₘₚ s₄
 | aMP : FEₘₚ ( [A₂ₘ], [aₚᵣ] )
 | awẽMP : FEₘₚ ( [wẽₘ ; A₁ₘ], [wẽₚᵣ ; aₚᵣ] )
 | ãMP : FEₘₚ ( [Ãₘ], [ãₚᵣ] )
@@ -787,7 +825,7 @@ Inductive FEₘₚ : structₘₚ → Prop :=
     FEₘₚ α → FEₘₚ ((rule1ₘₚ [PERSONABLEₘ] personₖ [kã₂ₘ] [kãₚᵣ])
                      α proofₘ proofₖ)
 | pa₂MP : ∀ α proofₘ proofₖ,
-    FEₘₚ α → FEₘₚ ((rule1ₘₚ [INFₘ] verbₖ [pa₂ₘ] [paₚᵣ])
+    FEₘₚ α → FEₘₚ ((rule1ₘₚ [CLOSEABLEₘ] verbₖ [pa₂ₘ] [paₚᵣ])
                      α proofₘ proofₖ)
 | teMP : ∀ α proofₘ proofₖ,
     FEₘₚ α → FEₘₚ ((rule1ₘₚ [GERABLEₘ] verbₖ [teₘ] [teₚᵣ])
@@ -835,20 +873,20 @@ Infix "≡ₘₚ" := equivₘₚ (at level 90).
 
 (** Below is a highly simplified tectogrammatical type for LCG. *)
 
-Inductive τ_anno :=
-| 1_du
-| 1_inc
-| 1_pl
-| 1_sg
-| 2_du
-| 2_mo
-| 2_pl
-| 2_sg
-| 3_du
-| 3_f
-| 3_h
-| 3_pl
-| T.
+Inductive τ_anno : Set :=
+| t1_du
+| t1_inc
+| t1_pl
+| t1_sg
+| t2_du
+| t2_mo
+| t2_pl
+| t2_sg
+| t3_du
+| t3_f
+| t3_h
+| t3_pl
+| t.
     
 Inductive τ : Set :=
 | Nom (α : τ_anno)
@@ -1256,19 +1294,19 @@ Definition structₛₚ := (ϕ * τ * sense).
 
 Definition τₘ (catₘ : list m) : τ_anno :=
   match (personFilterₘ catₘ) with
-  | [ diₘ ; dãₘ ] => 3_pl
-  | [ diₘ ; bõ₂ₘ ] => 1_pl
-  | [ diₘ ; bĩₘ ] => 2_pl
-  | [ daₘ ; bõ₂ₘ ] => 1_du
-  | [ daₘ ; bĩₘ ] => 2_du
-  | [ biₘ ] => 2_sg
-  | [ bĩₘ ] => 2_mo
-  | [ boₘ ] => 1_sg
-  | [ bõ₂ₘ ] => 1_inc
-  | [ daₘ ] => 3_du
-  | [ dãₘ ] => 3_f
-  | [ kã₂ₘ ] => 3_h
-  | otherwise => T
+  | [ diₘ ; dãₘ ] => t3_pl
+  | [ diₘ ; bõ₂ₘ ] => t1_pl
+  | [ diₘ ; bĩₘ ] => t2_pl
+  | [ daₘ ; bõ₂ₘ ] => t1_du
+  | [ daₘ ; bĩₘ ] => t2_du
+  | [ biₘ ] => t2_sg
+  | [ bĩₘ ] => t2_mo
+  | [ boₘ ] => t1_sg
+  | [ bõ₂ₘ ] => t1_inc
+  | [ daₘ ] => t3_du
+  | [ dãₘ ] => t3_f
+  | [ kã₂ₘ ] => t3_h
+  | otherwise => t
   end.
 
 (** A rule schema for form to sign mappings. *)
@@ -1321,6 +1359,13 @@ Inductive SEₛₚ : structₛₚ → Prop :=
              (func ent ent)
              (λ x,x))
             mp₁ mp₂ β proofₑᵥ proofₘ proofₖ proofₛ)
+| nounSP : ∀ mp₁ mp₂ β proofₑᵥ proofₘ proofₖ proofₛ,
+    SEₛₚ ((ruleₛₚ [INFₘ] nominalₖ (λ s,s)
+             ((λ t,N t) ∘ τₘ)
+             (func ent ent)
+             (func ent ent)
+             (λ x,x))
+            mp₁ mp₂ β proofₑᵥ proofₘ proofₖ proofₛ)
 | intransSP : ∀ mp₁ mp₂ β proofₑᵥ proofₘ proofₖ proofₛ,
     SEₛₚ ((ruleₛₚ [INFₘ] verbₖ (λ s,s)
              ((λ t,Nom t ⊸ Fin) ∘ τₘ)
@@ -1336,7 +1381,7 @@ Inductive SEₛₚ : structₛₚ → Prop :=
              (λ x,x))
             mp₁ mp₂ β proofₑᵥ proofₘ proofₖ proofₛ).
 
-Example yẽdẽSE : SEₛₚ (η "yẽdẽ" • xϕ, N T ⊸ Adj T, adjsense big).
+Example yẽdẽSE : SEₛₚ (η "yẽdẽ" • xϕ, N t ⊸ Adj t, adjsense big).
 Proof.
   assert (equivyẽdẽ : ([ Yẽdẽₘ ], [ yẽdẽₚᵣ ]) ≡ₘₚ ([ Yẽdẽₘ ], [ yẽdẽₚᵣ ])).
   apply reflₘₚ.
@@ -1356,7 +1401,7 @@ Proof.
   apply (adjSP ([ Yẽdẽₘ ], [ yẽdẽₚᵣ ]) ([ Yẽdẽₘ ], [ yẽdẽₚᵣ ]) big equivyẽdẽ yẽdẽinf yẽdẽadj yẽdẽmean).
 Qed.
 
-Example yẽdẽkaSE : SEₛₚ (η "yẽdẽka", Nom T, (existT Sns ent (ι (λ x : e, (big onenoun x and fruit x) and onenoun x)))).
+Example yẽdẽkaSE : SEₛₚ (η "yẽdẽka", Nom t, (existT Sns ent (ι (λ x : e, (big onenoun x and fruit x) and onenoun x)))).
   assert (equivyẽdẽka : ([ ka₁ₘ ; Yẽdẽₘ ], [ kaₚᵣ ; yẽdẽₚᵣ ]) ≡ₘₚ ([ ka₁ₘ ; Yẽdẽₘ ], [ kaₚᵣ ; yẽdẽₚᵣ ])).
   apply reflₘₚ.
   simpl.
@@ -1387,3 +1432,6 @@ Example yẽdẽkaSE : SEₛₚ (η "yẽdẽka", Nom T, (existT Sns ent (ι (λ
   reflexivity.
   apply (def_nomSP ([ ka₁ₘ ; Yẽdẽₘ ], [ kaₚᵣ ; yẽdẽₚᵣ ]) ([ ka₁ₘ ; Yẽdẽₘ ], [ kaₚᵣ ; yẽdẽₚᵣ ]) (ι(λ x,(big onenoun x) and (fruit x) and (onenoun x))) equivyẽdẽka yẽdẽinf yẽdẽkanominal yẽdẽkamean).
 Qed.
+
+Print yẽdẽkaSE.
+
