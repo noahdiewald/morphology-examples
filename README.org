@@ -1,16 +1,14 @@
 * Examples from talks and papers
 
-The files in this repository are mostly more fleshed out examples from talks.
-They still consitute incomplete fragments but provide details that are otherwise missing in overviews.
+The Coq (Rcoq) files in this repository are morpological fragment analyses.
+Some are fleshed out examples from talks or papers.
+In addition, Wao2.v includes the code of the formal theory used in my thesis, "Wao Terero Lexical Suffixes".
+This represents my most current work on morphological theory and the most advanced formalism.
 
-In addition, there also code used in the development of the formal theory used in my thesis, "Wao Terero Lexical Suffixes".
-This represents my most current work on formal morphological theory and the most advanced formalism.
-
-The code is poorly commented.
-These files are intended to back up high level discussion from less technical talks and papers.
-They are not intended for use outside those contexts at this point.
+The code may be poorly commented.
+These files are intended to back up high level discussion from less technical talks and papers, demonstrating that there is no hand waving in my formal work, even if it is necessary to simplify the presentation of analyses for general audiences.
 Please contact me if you have any questions about these files.
-I make them available not because they are polished but in the interest of open science.
+I make them available not because they are polished, but in the interest of open science.
 Please contact me before citing any work found here.
 
 ** Background
@@ -31,7 +29,7 @@ His work is found in:
 - THS.v
 - Vect.v
 
-I will provide a link to his thesis when it is available.
+Many of the concepts encoded in those files are described in detail in Jordan Needle's thesis, [[https://etd.ohiolink.edu/acprod/odb_etd/ws/send_file/send?accession=osu1732611563080209&disposition=inline][Relational Dynamic Categorial Grammar]].
 
 ** Potawatomi possession: PotawatomiPoss.v
 
@@ -60,5 +58,5 @@ The phenomenon is described in:
 
 ** Lexical Suffix Analysis for Thesis: Wao2.v
 
-This is a work in progress.
+This is a substantial analysis of lexical suffixes and inflection in Wao Terero, which is described in my thesis.
 I will post a link to the thesis when it is complete.
